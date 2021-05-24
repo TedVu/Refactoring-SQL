@@ -1,2 +1,2 @@
 # Refactoring-SQL
-This is a repo consisting the rewrite for sql rewriting
+This is a repo consisting the rewrite for sql conversion.
