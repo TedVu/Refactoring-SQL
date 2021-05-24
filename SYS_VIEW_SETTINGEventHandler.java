@@ -42,20 +42,20 @@ import org.apache.commons.lang3.StringUtils;
 public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterface {
 
   public static String getUsersFunction =
-      "declare function local:getUsers($userID)"
-          + "{"
-          + "if ($userID != '')"
-          + "then <USER_DOCUMENT>"
-          + " {"
-          + " let $user_documents := for $SYS_USER_SETTINGS_document in collection(\"orbeon/fr/SYS/SYS_USER_SETTING/data\") where $SYS_USER_SETTINGS_document//SYS_DOCUMENT_ID =$userID return $SYS_USER_SETTINGS_document "
-          + " return <member>"
-          + "     {"
-          + "       for $member in $user_documents where $member//SYS_USER_USER_TYPE ='1' return $member"
-          + "     }"
-          + "     {"
-          + "       for $member in $user_documents where $member//SYS_USER_USER_TYPE ='2' return local:getUsers($member//SYS_USER_GROUP_MEMBERS_SECTION/SYS_USER_GROUP_MEMBERS_SECTION-iteration/SYS_KEYWORD_OPTION_VALUE/text())"
-          + "     }"
-          + "     </member>}</USER_DOCUMENT>  else ()}; ";
+    "declare function local:getUsers($userID)" +
+    "{" +
+    "if ($userID != '')" +
+    "then <USER_DOCUMENT>" +
+    " {" +
+    " let $user_documents := for $SYS_USER_SETTINGS_document in collection(\"orbeon/fr/SYS/SYS_USER_SETTING/data\") where $SYS_USER_SETTINGS_document//SYS_DOCUMENT_ID =$userID return $SYS_USER_SETTINGS_document " +
+    " return <member>" +
+    "     {" +
+    "       for $member in $user_documents where $member//SYS_USER_USER_TYPE ='1' return $member" +
+    "     }" +
+    "     {" +
+    "       for $member in $user_documents where $member//SYS_USER_USER_TYPE ='2' return local:getUsers($member//SYS_USER_GROUP_MEMBERS_SECTION/SYS_USER_GROUP_MEMBERS_SECTION-iteration/SYS_KEYWORD_OPTION_VALUE/text())" +
+    "     }" +
+    "     </member>}</USER_DOCUMENT>  else ()}; ";
 
   public void afterOpen(Document document, BusinessUser currentUser) {
 
@@ -67,25 +67,25 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
   public void afterRefresh(Document document, BusinessUser currentUser) {
     FieldBase formField = document.getFieldFromMap("SYS_VIEW_SETTING_FORM");
 
-    ArrayList<KeywordOption> repeaterOptions = new ArrayList<KeywordOption>();
+    ArrayList < KeywordOption > repeaterOptions = new ArrayList < KeywordOption > ();
 
     String formID = formField.getValuesAsText();
 
     if (formID != null) {
       FormSetting fs = SettingManager.getSettingManager().getFormSetting(formID);
-      HashMap<String, SectionSetting> sectionsMap = fs.getSectionSettingsMap();
-      for (String sectionName : sectionsMap.keySet()) {
+      HashMap < String, SectionSetting > sectionsMap = fs.getSectionSettingsMap();
+      for (String sectionName: sectionsMap.keySet()) {
         SectionSetting ss = sectionsMap.get(sectionName);
         if (ss.isRepeatable()) {
           repeaterOptions.add(new KeywordOption(ss.getDesignName(), ss.getSectionID() + "", false));
         } else {
-          HashMap<String, GridSetting> gridsMap = ss.getGridSettingsMap();
+          HashMap < String, GridSetting > gridsMap = ss.getGridSettingsMap();
 
-          for (String gridName : gridsMap.keySet()) {
+          for (String gridName: gridsMap.keySet()) {
             GridSetting gs = gridsMap.get(gridName);
             if (gs.isRepeatable()) {
               repeaterOptions.add(
-                  new KeywordOption(gs.getDesignName(), gs.getGridID() + "", false));
+                new KeywordOption(gs.getDesignName(), gs.getGridID() + "", false));
             }
           }
         }
@@ -93,18 +93,17 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
     }
 
     Section secondaryFormSection = document.getSectionFromMap("SYS_VIEW_SETTING_REP_FIELDS");
-    Collection<SectionRecord> secondaryFormRepeaters = secondaryFormSection.getSectionRecords();
+    Collection < SectionRecord > secondaryFormRepeaters = secondaryFormSection.getSectionRecords();
 
-    if(secondaryFormRepeaters != null)
-    {
-      for (SectionRecord repeater : secondaryFormRepeaters) {
-            SingleSelectList repeaterList =
-                (SingleSelectList) repeater.getFieldFromMap("SYS_VIEW_SETTING_REP_SEC_NAME");
-            repeaterList.setKeywordOptions(repeaterOptions);
-            repeaterList.setKeywordOptionsInDynamicSection();
-          }
+    if (secondaryFormRepeaters != null) {
+      for (SectionRecord repeater: secondaryFormRepeaters) {
+        SingleSelectList repeaterList =
+          (SingleSelectList) repeater.getFieldFromMap("SYS_VIEW_SETTING_REP_SEC_NAME");
+        repeaterList.setKeywordOptions(repeaterOptions);
+        repeaterList.setKeywordOptionsInDynamicSection();
+      }
     }
-    
+
   }
 
   @Override
@@ -133,8 +132,8 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
     displayNameValue = displayNameValue.replace("\\", "/");
     displayNameField.setValue(displayNameValue);
 
-    if (document.checkUniqueness("SYS_VIEW_SETTING_NAME")
-        && document.checkUniqueness("SYS_VIEW_SETTING_DISPLAY_NAME")) {
+    if (document.checkUniqueness("SYS_VIEW_SETTING_NAME") &&
+      document.checkUniqueness("SYS_VIEW_SETTING_DISPLAY_NAME")) {
 
       //DebugUtility.debug("SAVE CALLED FOR View 3");
       UserManager uu = UserManager.getUserManager();
@@ -144,16 +143,16 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
       Application systemApplication = document.getParentApplication();
 
       Boolean editXqueryManually =
-          (Boolean) document.getFieldFromMap("SYS_VIEW_SETTING_XQUERY_MANUALLY");
+        (Boolean) document.getFieldFromMap("SYS_VIEW_SETTING_XQUERY_MANUALLY");
 
       // Get Main Form setting ID
       String formID = document.getFieldFromMap("SYS_VIEW_SETTING_FORM").getValuesAsText();
       String formName = null;
       String applicationName = null;
-      LinkedList<FieldSetting> fieldNamesList = null;
+      LinkedList < FieldSetting > fieldNamesList = null;
 
-      ArrayList<String> expandFieldList = null;
-      LinkedHashMap<String, String> formResultsXqueryMap = null;
+      ArrayList < String > expandFieldList = null;
+      LinkedHashMap < String, String > formResultsXqueryMap = null;
 
       if (formID != null && !formID.equals("") && !editXqueryManually.isFieldSet()) {
         //DebugUtility.debug("View Setting on save 1.1:");
@@ -176,16 +175,16 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
               // Collection<SectionRecord> columnRecords = columnSection.getSectionRecords();
               // Iterator<SectionRecord> columnRecordsIterator = null;
               FRFormInstanceSectionInterface columnSectionInstance =
-                  dataInstance.getSection("SYS_VIEW_SETTING_COLUMNS");
-              ArrayList<FRFormInstanceRepeatableSectionInterface> columnSectionInstances =
-                  columnSectionInstance.getRepeatableSection("SYS_VIEW_SETTING_COLUMNS");
+                dataInstance.getSection("SYS_VIEW_SETTING_COLUMNS");
+              ArrayList < FRFormInstanceRepeatableSectionInterface > columnSectionInstances =
+                columnSectionInstance.getRepeatableSection("SYS_VIEW_SETTING_COLUMNS");
 
               if (columnSectionInstances != null) {
                 // DebugUtility.debug("View Setting on save 1.5:");
                 // columnRecordsIterator = columnRecords.iterator();
                 // while(columnRecordsIterator.hasNext())
-                for (FRFormInstanceRepeatableSectionInterface columnSectionInstanceRecord :
-                    columnSectionInstances) {
+                for (FRFormInstanceRepeatableSectionInterface columnSectionInstanceRecord:
+                  columnSectionInstances) {
                   // DebugUtility.debug("View Setting on save 1.6:");
                   // SectionRecord columnRecord = columnRecordsIterator.next();
                   // AutoCompleteList fieldIDField =
@@ -193,13 +192,13 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
                   // String fieldID = fieldIDField.getValuesAsText();
 
                   String fieldID =
-                      columnSectionInstanceRecord
-                          .getField("SYS_VIEW_SETTING_FIELD_NAME")
-                          .getContent();
+                    columnSectionInstanceRecord
+                    .getField("SYS_VIEW_SETTING_FIELD_NAME")
+                    .getContent();
                   String expandFieldText =
-                      columnSectionInstanceRecord
-                          .getField("SYS_VIEW_SETTING_FIELD_EXPAND")
-                          .getContent();
+                    columnSectionInstanceRecord
+                    .getField("SYS_VIEW_SETTING_FIELD_EXPAND")
+                    .getContent();
 
                   FieldSetting fieldSetting = null;
                   if (!StringUtils.isBlank(fieldID)) {
@@ -236,56 +235,56 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
             if (applicationName != null && formName != null && fieldNamesList != null) {
               formResultsXqueryMap = new LinkedHashMap();
               String xquery =
-                  this.existBuildViewQuery(
-                      document,
-                      applicationName,
-                      formName,
-                      fieldNamesList,
-                      true,
-                      false,
-                      null,
-                      null,
-                      null,
-                      null,
-                      null,
-                      null,
-                      columnCountSoFar,
-                      formResultsXqueryMap,
-                      expandFieldList);
+                this.existBuildViewQuery(
+                  document,
+                  applicationName,
+                  formName,
+                  fieldNamesList,
+                  true,
+                  false,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  columnCountSoFar,
+                  formResultsXqueryMap,
+                  expandFieldList);
 
               // DebugUtility.debug("View Setting on save 1.7: JOIN SECONDARY FORM, MAIN
               // FORM:"+formName);
 
               // Get Repeat Section form query
               xquery =
-                  joinRepeatSectionViewQuery(
-                      document, xquery, formName, columnCountSoFar, formResultsXqueryMap);
+                joinRepeatSectionViewQuery(
+                  document, xquery, formName, columnCountSoFar, formResultsXqueryMap);
 
               // Get Secondary form query
               xquery =
-                  joinSecondaryFormViewQuery(
-                      document, xquery, formName, columnCountSoFar, formResultsXqueryMap);
+                joinSecondaryFormViewQuery(
+                  document, xquery, formName, columnCountSoFar, formResultsXqueryMap);
 
               // Add get users function to the query (if not an external view)
               boolean isExternal = false;
 
               if (document.getFieldFromMap("SYS_VIEW_SETTING_EXTERNAL") != null) {
                 if (document
-                    .getFieldFromMap("SYS_VIEW_SETTING_EXTERNAL")
-                    .getValuesAsText()
-                    .equals("true")) {
+                  .getFieldFromMap("SYS_VIEW_SETTING_EXTERNAL")
+                  .getValuesAsText()
+                  .equals("true")) {
                   isExternal = true;
                 }
               }
-              
+
               //DebugUtility.debug("View Setting on save SQL 1");
               if (document
-                  .getFieldFromMap("SYS_VIEW_SETTING_IS_SQL")
-                  .getValuesAsText()
-                  .equals("true")) {
-                
+                .getFieldFromMap("SYS_VIEW_SETTING_IS_SQL")
+                .getValuesAsText()
+                .equals("true")) {
+
                 //DebugUtility.debug("View Setting on save SQL 2");
-                
+
                 viewXqueryField.setValue(buildSQLViewQuery(formName, fieldNamesList, document));
               } else if (!isExternal) {
                 viewXqueryField.setValue(getUsersFunction + xquery);
@@ -297,8 +296,8 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
 
               if (formResultsXqueryMap != null) {
                 if (formResultsXqueryMap.keySet() != null) {
-                  Iterator<String> formResultsXqueryKeyItr =
-                      formResultsXqueryMap.keySet().iterator();
+                  Iterator < String > formResultsXqueryKeyItr =
+                    formResultsXqueryMap.keySet().iterator();
 
                   while (formResultsXqueryKeyItr.hasNext()) {
                     String key = formResultsXqueryKeyItr.next();
@@ -320,57 +319,57 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
   }
 
   public String joinSecondaryFormViewQuery(
-      Document document,
-      String mainFormQuery,
-      String mainFormName,
-      int columnCountSoFar,
-      LinkedHashMap<String, String> formResultsXqueryMap)
-      throws NumberFormatException, SystemException, PortalException {
+    Document document,
+    String mainFormQuery,
+    String mainFormName,
+    int columnCountSoFar,
+    LinkedHashMap < String, String > formResultsXqueryMap)
+  throws NumberFormatException, SystemException, PortalException {
     // Get All additional forms, get their query and join with above form
     SettingManager sm = SettingManager.getSettingManager();
 
     Section secondaryFormSection = document.getSectionFromMap("SYS_VIEW_SETTING_ADD_FORM");
-    LinkedList<FieldSetting> fieldNamesList = null;
+    LinkedList < FieldSetting > fieldNamesList = null;
 
     String secondaryFormViewQuery = "";
 
     if (secondaryFormSection != null) {
       // Reset the fieldNames List
 
-      Collection<SectionRecord> secondaryFormRecordCol = secondaryFormSection.getSectionRecords();
+      Collection < SectionRecord > secondaryFormRecordCol = secondaryFormSection.getSectionRecords();
       if (secondaryFormRecordCol != null) {
-        Iterator<SectionRecord> secondaryFormRecordItr = secondaryFormRecordCol.iterator();
-        HashMap<String, String> secondaryFormJoinStatements = new HashMap();
+        Iterator < SectionRecord > secondaryFormRecordItr = secondaryFormRecordCol.iterator();
+        HashMap < String, String > secondaryFormJoinStatements = new HashMap();
 
         while (secondaryFormRecordItr.hasNext()) {
           SectionRecord secondaryFormRecord = secondaryFormRecordItr.next();
 
           AutoCompleteList secondFormIDField =
-              (AutoCompleteList)
-                  secondaryFormRecord.getFieldFromMap("SYS_VIEW_SETTING_ADD_FORM_NAME");
+            (AutoCompleteList)
+          secondaryFormRecord.getFieldFromMap("SYS_VIEW_SETTING_ADD_FORM_NAME");
           AutoCompleteList whereFieldIDField =
-              (AutoCompleteList)
-                  secondaryFormRecord.getFieldFromMap("SYS_VIEW_SETTING_ADD_FORM_WHERE");
+            (AutoCompleteList)
+          secondaryFormRecord.getFieldFromMap("SYS_VIEW_SETTING_ADD_FORM_WHERE");
           AutoCompleteList equalsFormIDField =
-              (AutoCompleteList)
-                  secondaryFormRecord.getFieldFromMap("SYS_VIEW_SETTING_ADD_FORM_EQUALS_NAME");
+            (AutoCompleteList)
+          secondaryFormRecord.getFieldFromMap("SYS_VIEW_SETTING_ADD_FORM_EQUALS_NAME");
           AutoCompleteList equalsFieldIDField =
-              (AutoCompleteList)
-                  secondaryFormRecord.getFieldFromMap("SYS_VIEW_SETTING_ADD_FORM_EQUALS");
+            (AutoCompleteList)
+          secondaryFormRecord.getFieldFromMap("SYS_VIEW_SETTING_ADD_FORM_EQUALS");
 
           String secondFormID = secondFormIDField.getValuesAsText();
           String whereFieldID = whereFieldIDField.getValuesAsText();
           String equalsFormID = equalsFormIDField.getValuesAsText();
           String equalsFieldID = equalsFieldIDField.getValuesAsText();
 
-          if (secondFormID != null
-              && !secondFormID.equals("")
-              && whereFieldID != null
-              && !whereFieldID.equals("")
-              && equalsFormID != null
-              && !equalsFormID.equals("")
-              && equalsFieldID != null
-              && !equalsFieldID.equals("")) {
+          if (secondFormID != null &&
+            !secondFormID.equals("") &&
+            whereFieldID != null &&
+            !whereFieldID.equals("") &&
+            equalsFormID != null &&
+            !equalsFormID.equals("") &&
+            equalsFieldID != null &&
+            !equalsFieldID.equals("")) {
             FormSetting secondFormSetting = sm.getFormSetting(new Long(secondFormID));
             FieldSetting whereField = sm.getFieldSetting(new Long(whereFieldID));
             FormSetting equalsFormSetting = sm.getFormSetting(new Long(equalsFormID));
@@ -379,7 +378,7 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
             String secondFormName = secondFormSetting.getDesignName();
             String equalsFormName = equalsFormSetting.getDesignName();
             String secondApplicationName =
-                secondFormSetting.getParentApplicationSetting().getDesignName();
+              secondFormSetting.getParentApplicationSetting().getDesignName();
 
             // DebugUtility.debug("View Setting on save 2.1: JOIN SECONDARY FORM, MAIN
             // FORM:"+mainFormName);
@@ -390,11 +389,11 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
 
             // Get the columns from the secondary form setting
             Grid columnGrid =
-                secondaryFormRecord.getGridFromMap("SYS_VIEW_SETTING_JOIN_COLUMN_GRID");
+              secondaryFormRecord.getGridFromMap("SYS_VIEW_SETTING_JOIN_COLUMN_GRID");
             if (columnGrid != null) {
               // DebugUtility.debug("SECONDARY FORM QUERY 1.4:");
-              Collection<GridRecord> columnRecords = columnGrid.getGridRecords();
-              Iterator<GridRecord> columnRecordsIterator = null;
+              Collection < GridRecord > columnRecords = columnGrid.getGridRecords();
+              Iterator < GridRecord > columnRecordsIterator = null;
 
               if (columnRecords != null) {
                 // DebugUtility.debug("SECONDARY FORM QUERY 1.5:");
@@ -403,8 +402,8 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
                   // DebugUtility.debug("SECONDARY FORM QUERY 1.6:");
                   GridRecord columnRecord = columnRecordsIterator.next();
                   AutoCompleteList fieldIDField =
-                      (AutoCompleteList)
-                          columnRecord.getFieldFromMap("SYS_VIEW_SETTING_JOIN_COLUMN_FIELD");
+                    (AutoCompleteList)
+                  columnRecord.getFieldFromMap("SYS_VIEW_SETTING_JOIN_COLUMN_FIELD");
                   String fieldID = fieldIDField.getValuesAsText();
 
                   FieldSetting fieldSetting = sm.getFieldSetting(new Long(fieldID));
@@ -419,10 +418,10 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
               }
             }
 
-            if (secondApplicationName != null
-                && equalsFormName != null
-                && secondFormName != null
-                && fieldNamesList != null) {
+            if (secondApplicationName != null &&
+              equalsFormName != null &&
+              secondFormName != null &&
+              fieldNamesList != null) {
               // DebugUtility.debug("SECONDARY FORM QUERY 2.1: secondFormName:"+secondFormName);
               // DebugUtility.debug("SECONDARY FORM QUERY 2.1:
               // secondApplicationName:"+secondApplicationName);
@@ -435,31 +434,31 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
               // secondaryFormJoinStatements:"+secondaryFormJoinStatements);
 
               secondaryFormViewQuery =
-                  this.existBuildViewQuery(
-                      document,
-                      secondApplicationName,
-                      secondFormName,
-                      fieldNamesList,
-                      false,
-                      false,
-                      null,
-                      mainFormName,
-                      whereField,
-                      equalsFormName,
-                      equalsField,
-                      secondaryFormJoinStatements,
-                      columnCountSoFar,
-                      formResultsXqueryMap,
-                      null);
+                this.existBuildViewQuery(
+                  document,
+                  secondApplicationName,
+                  secondFormName,
+                  fieldNamesList,
+                  false,
+                  false,
+                  null,
+                  mainFormName,
+                  whereField,
+                  equalsFormName,
+                  equalsField,
+                  secondaryFormJoinStatements,
+                  columnCountSoFar,
+                  formResultsXqueryMap,
+                  null);
               // DebugUtility.debug("SECONDARY FORM QUERY 2.2:"+secondaryFormViewQuery);
 
               // join with main form query
               if (equalsFormName.equals(mainFormName)) {
                 // DebugUtility.debug("SECONDARY FORM QUERY 2.3");
                 mainFormQuery =
-                    mainFormQuery.replace(
-                        "</SYS_VIEW_ROW-iteration>",
-                        "{ \r\n" + secondaryFormViewQuery + "\r\n} </SYS_VIEW_ROW-iteration>");
+                  mainFormQuery.replace(
+                    "</SYS_VIEW_ROW-iteration>",
+                    "{ \r\n" + secondaryFormViewQuery + "\r\n} </SYS_VIEW_ROW-iteration>");
                 formResultsXqueryMap.put(mainFormName, mainFormQuery);
               } else {
                 // DebugUtility.debug("SECONDARY FORM QUERY 2.4:"+equalsFormName);
@@ -468,7 +467,7 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
                 // DebugUtility.debug("SECONDARY FORM QUERY 2.4.1:"+equalsFormResultQuery);
 
                 int lastOccurrenceOfClosingTag =
-                    equalsFormResultQuery.lastIndexOf("</SYS_VIEW_SECONDARY_FORM>");
+                  equalsFormResultQuery.lastIndexOf("</SYS_VIEW_SECONDARY_FORM>");
 
                 // DebugUtility.debug("SECONDARY FORM QUERY 2.4.2:"+lastOccurrenceOfClosingTag);
                 String updatedEqualsFormResultQuery = null;
@@ -480,18 +479,18 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
                 // else
 
                 updatedEqualsFormResultQuery =
-                    new StringBuilder(equalsFormResultQuery)
-                        .replace(
-                            lastOccurrenceOfClosingTag,
-                            lastOccurrenceOfClosingTag + 26,
-                            "{ \r\n" + secondaryFormViewQuery + "\r\n} </SYS_VIEW_SECONDARY_FORM>")
-                        .toString();
+                  new StringBuilder(equalsFormResultQuery)
+                  .replace(
+                    lastOccurrenceOfClosingTag,
+                    lastOccurrenceOfClosingTag + 26,
+                    "{ \r\n" + secondaryFormViewQuery + "\r\n} </SYS_VIEW_SECONDARY_FORM>")
+                  .toString();
                 // DebugUtility.debug("SECONDARY FORM QUERY 2.4.3:"+updatedEqualsFormResultQuery);
 
                 // DebugUtility.debug("SECONDARY FORM QUERY 2.4.4:"+mainFormQuery);
 
                 mainFormQuery =
-                    mainFormQuery.replace(equalsFormResultQuery, updatedEqualsFormResultQuery);
+                  mainFormQuery.replace(equalsFormResultQuery, updatedEqualsFormResultQuery);
 
                 // DebugUtility.debug("SECONDARY FORM QUERY 2.4.5:"+mainFormQuery);
 
@@ -509,49 +508,49 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
   }
 
   public String joinRepeatSectionViewQuery(
-      Document document,
-      String mainFormQuery,
-      String mainFormName,
-      int columnCountSoFar,
-      LinkedHashMap<String, String> formResultsXqueryMap)
-      throws NumberFormatException, SystemException, PortalException {
+    Document document,
+    String mainFormQuery,
+    String mainFormName,
+    int columnCountSoFar,
+    LinkedHashMap < String, String > formResultsXqueryMap)
+  throws NumberFormatException, SystemException, PortalException {
     // Get All additional forms, get their query and join with above form
     SettingManager sm = SettingManager.getSettingManager();
 
     Section secondaryFormSection = document.getSectionFromMap("SYS_VIEW_SETTING_REP_FIELDS");
-    LinkedList<FieldSetting> fieldNamesList = null;
+    LinkedList < FieldSetting > fieldNamesList = null;
 
     String secondaryFormViewQuery = "";
 
     if (secondaryFormSection != null) {
       // Reset the fieldNames List
 
-      Collection<SectionRecord> secondaryFormRecordCol = secondaryFormSection.getSectionRecords();
+      Collection < SectionRecord > secondaryFormRecordCol = secondaryFormSection.getSectionRecords();
       if (secondaryFormRecordCol != null) {
-        Iterator<SectionRecord> secondaryFormRecordItr = secondaryFormRecordCol.iterator();
-        HashMap<String, String> secondaryFormJoinStatements = new HashMap();
+        Iterator < SectionRecord > secondaryFormRecordItr = secondaryFormRecordCol.iterator();
+        HashMap < String, String > secondaryFormJoinStatements = new HashMap();
 
         while (secondaryFormRecordItr.hasNext()) {
           SectionRecord secondaryFormRecord = secondaryFormRecordItr.next();
 
           String repeaterName =
-              secondaryFormRecord
-                  .getFieldFromMap("SYS_VIEW_SETTING_REP_SEC_NAME")
-                  .getValuesAsDisplayText();
+            secondaryFormRecord
+            .getFieldFromMap("SYS_VIEW_SETTING_REP_SEC_NAME")
+            .getValuesAsDisplayText();
           if (repeaterName != null && !repeaterName.equals("")) {
             FormSetting mainFormSetting = sm.getFormSetting(mainFormName);
 
             String secondApplicationName =
-                mainFormSetting.getParentApplicationSetting().getDesignName();
+              mainFormSetting.getParentApplicationSetting().getDesignName();
             String secondFormName = mainFormName;
 
             // Get the columns from the secondary form setting
             Grid columnGrid =
-                secondaryFormRecord.getGridFromMap("SYS_VIEW_SETTING_REP_FIELDS_SELECTION");
+              secondaryFormRecord.getGridFromMap("SYS_VIEW_SETTING_REP_FIELDS_SELECTION");
             if (columnGrid != null) {
               // DebugUtility.debug("SECONDARY FORM QUERY 1.4:");
-              Collection<GridRecord> columnRecords = columnGrid.getGridRecords();
-              Iterator<GridRecord> columnRecordsIterator = null;
+              Collection < GridRecord > columnRecords = columnGrid.getGridRecords();
+              Iterator < GridRecord > columnRecordsIterator = null;
 
               if (columnRecords != null) {
                 // DebugUtility.debug("SECONDARY FORM QUERY 1.5:");
@@ -560,8 +559,8 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
                   // DebugUtility.debug("SECONDARY FORM QUERY 1.6:");
                   GridRecord columnRecord = columnRecordsIterator.next();
                   AutoCompleteList fieldIDField =
-                      (AutoCompleteList)
-                          columnRecord.getFieldFromMap("SYS_VIEW_SETTING_REP_FIELDS_FIELD_NAME");
+                    (AutoCompleteList)
+                  columnRecord.getFieldFromMap("SYS_VIEW_SETTING_REP_FIELDS_FIELD_NAME");
                   String fieldID = fieldIDField.getValuesAsText();
 
                   FieldSetting fieldSetting = sm.getFieldSetting(new Long(fieldID));
@@ -581,29 +580,29 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
               // DebugUtility.debug("SECONDARY FORM QUERY 2.1: mainFormName:"+mainFormName);
 
               secondaryFormViewQuery =
-                  this.existBuildViewQuery(
-                      document,
-                      secondApplicationName,
-                      secondFormName,
-                      fieldNamesList,
-                      false,
-                      true,
-                      repeaterName,
-                      mainFormName,
-                      null,
-                      null,
-                      null,
-                      secondaryFormJoinStatements,
-                      columnCountSoFar,
-                      formResultsXqueryMap,
-                      null);
+                this.existBuildViewQuery(
+                  document,
+                  secondApplicationName,
+                  secondFormName,
+                  fieldNamesList,
+                  false,
+                  true,
+                  repeaterName,
+                  mainFormName,
+                  null,
+                  null,
+                  null,
+                  secondaryFormJoinStatements,
+                  columnCountSoFar,
+                  formResultsXqueryMap,
+                  null);
               // DebugUtility.debug("SECONDARY FORM QUERY:"+secondaryFormViewQuery);
 
               // join with main form query
               mainFormQuery =
-                  mainFormQuery.replace(
-                      "</SYS_VIEW_ROW-iteration>",
-                      "{ \r\n" + secondaryFormViewQuery + "\r\n} </SYS_VIEW_ROW-iteration>");
+                mainFormQuery.replace(
+                  "</SYS_VIEW_ROW-iteration>",
+                  "{ \r\n" + secondaryFormViewQuery + "\r\n} </SYS_VIEW_ROW-iteration>");
               formResultsXqueryMap.put(mainFormName, mainFormQuery);
 
               // Clear the fieldNames list
@@ -617,27 +616,27 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
   }
 
   public String existBuildViewQuery(
-      Document document,
-      String applicationName,
-      String formName,
-      LinkedList<FieldSetting> fieldNames,
-      boolean isMainForm,
-      boolean isRepeatableSection,
-      String repeatSectionName,
-      String mainFormName,
-      FieldSetting whereFieldSetting,
-      String equalsFormName,
-      FieldSetting equalsFieldSetting,
-      HashMap<String, String> secondaryFormJoinStatements,
-      int columnCountSoFar,
-      LinkedHashMap<String, String> formResultsXqueryMap,
-      ArrayList<String> expandFieldList) {
+    Document document,
+    String applicationName,
+    String formName,
+    LinkedList < FieldSetting > fieldNames,
+    boolean isMainForm,
+    boolean isRepeatableSection,
+    String repeatSectionName,
+    String mainFormName,
+    FieldSetting whereFieldSetting,
+    String equalsFormName,
+    FieldSetting equalsFieldSetting,
+    HashMap < String, String > secondaryFormJoinStatements,
+    int columnCountSoFar,
+    LinkedHashMap < String, String > formResultsXqueryMap,
+    ArrayList < String > expandFieldList) {
     String existQuery = "";
     String existConnectionQuery = "";
     String formJoinQuery = "";
 
     boolean doesViewConsistOfKeywordFields = false;
-    HashMap<String, FieldSetting> keywordFieldsMap = null;
+    HashMap < String, FieldSetting > keywordFieldsMap = null;
 
     // DebugUtility.debug("existBuildViewQuery 1:"+fieldNames);
     // Get all the JOIN tables if the field is a keyword field
@@ -646,16 +645,16 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
 
       // DebugUtility.debug("existBuildViewQuery 2:"+fieldSetting.getFieldType());
 
-      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
+      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
         doesViewConsistOfKeywordFields = true;
 
         String fieldDesignName = fieldSetting.getDesignName();
@@ -696,7 +695,7 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
       if (document.getFieldFromMap("SYS_VIEW_SETTING_EXTERNAL").getValuesAsText().equals("true")) {
         isExternal = true;
         externalConnectionID =
-            document.getFieldFromMap("SYS_VIEW_SETTING_EXTERNAL_CONNECTION").getValuesAsText();
+          document.getFieldFromMap("SYS_VIEW_SETTING_EXTERNAL_CONNECTION").getValuesAsText();
       }
     }
     if (isExternal && !externalConnectionID.equals("")) {
@@ -706,45 +705,45 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
 
       if (connectionDocument != null) {
         existConnectionQuery =
-            connectionDocument.getFieldFromMap("SYS_CONNECTION_XQUERY").getValuesAsText();
+          connectionDocument.getFieldFromMap("SYS_CONNECTION_XQUERY").getValuesAsText();
       }
 
       existQuery =
-          " let $sorted_results := for $"
-              + formName
-              + " in $sql_results where $"
-              + formName
-              + "//sql:SYS_DOCUMENT_ID != '' return <SYS_VIEW_ROW-iteration>";
+        " let $sorted_results := for $" +
+        formName +
+        " in $sql_results where $" +
+        formName +
+        "//sql:SYS_DOCUMENT_ID != '' return <SYS_VIEW_ROW-iteration>";
       existQuery +=
-          " <SYS_VIEW_ROW_SELECT/><SYS_VIEW_ROW_ID>{data($"
-              + formName
-              + "//sql:SYS_DOCUMENT_ID)}</SYS_VIEW_ROW_ID>";
+        " <SYS_VIEW_ROW_SELECT/><SYS_VIEW_ROW_ID>{data($" +
+        formName +
+        "//sql:SYS_DOCUMENT_ID)}</SYS_VIEW_ROW_ID>";
 
     } else if (isMainForm && !isExternal) {
 
       existQuery = " let $sorted_results :=";
 
       existQuery +=
-          " for $"
-              + formName
-              + " in collection(\"/db/orbeon/fr/"
-              + applicationName
-              + "/"
-              + formName
-              + "/data\")";
+        " for $" +
+        formName +
+        " in collection(\"/db/orbeon/fr/" +
+        applicationName +
+        "/" +
+        formName +
+        "/data\")";
 
       // Get the results of all the fields
       // The document id cannot be blank
       existQuery +=
-          " where $"
-              + formName
-              + "//SYS_DOCUMENT_ID != '' "
-              + "return"
-              + " <SYS_VIEW_ROW-iteration>";
+        " where $" +
+        formName +
+        "//SYS_DOCUMENT_ID != '' " +
+        "return" +
+        " <SYS_VIEW_ROW-iteration>";
       existQuery +=
-          " <SYS_VIEW_ROW_SELECT/><SYS_VIEW_ROW_ID>{data($"
-              + formName
-              + "//SYS_DOCUMENT_ID)}</SYS_VIEW_ROW_ID>";
+        " <SYS_VIEW_ROW_SELECT/><SYS_VIEW_ROW_ID>{data($" +
+        formName +
+        "//SYS_DOCUMENT_ID)}</SYS_VIEW_ROW_ID>";
 
     } else if (!isMainForm && isRepeatableSection) {
       // Set Form Name as Repeatable Section Name so that results can be accessed
@@ -753,15 +752,15 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
       existQuery += " let $sorted_" + repeatSectionName + "_results :=";
 
       existQuery +=
-          " for $"
-              + repeatSectionName
-              + " in collection(concat(\"/db/orbeon/fr/"
-              + applicationName
-              + "/"
-              + mainFormName
-              + "/data/\", $"
-              + mainFormName
-              + "//SYS_DOCUMENT_ID))";
+        " for $" +
+        repeatSectionName +
+        " in collection(concat(\"/db/orbeon/fr/" +
+        applicationName +
+        "/" +
+        mainFormName +
+        "/data/\", $" +
+        mainFormName +
+        "//SYS_DOCUMENT_ID))";
       existQuery += " return $" + repeatSectionName + "//" + repeatSectionName + "-iteration";
 
       existQuery += "\r\n return if(fn:empty($sorted_" + repeatSectionName + "_results)) ";
@@ -773,13 +772,13 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
         String designName = fieldSetting.getDesignName();
 
         existQuery +=
-            " <SYS_VIEW_COLUMN name=\""
-                + designName
-                + "\" type=\""
-                + fieldSetting.getFieldType()
-                + "\" isNames=\""
-                + fieldSetting.isNamesField()
-                + "\">";
+          " <SYS_VIEW_COLUMN name=\"" +
+          designName +
+          "\" type=\"" +
+          fieldSetting.getFieldType() +
+          "\" isNames=\"" +
+          fieldSetting.isNamesField() +
+          "\">";
         existQuery += " <SYS_VIEW_COLUMN-iteration>";
         // Actual Value
         existQuery += " <SYS_VIEW_COLUMN_VALUE/>";
@@ -792,11 +791,11 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
 
       existQuery += " </SYS_VIEW_SECONDARY_FORM>";
       existQuery +=
-          "\r\n else for $"
-              + repeatSectionName
-              + " in $sorted_"
-              + repeatSectionName
-              + "_results return";
+        "\r\n else for $" +
+        repeatSectionName +
+        " in $sorted_" +
+        repeatSectionName +
+        "_results return";
 
       existQuery += "\r\n <SYS_VIEW_SECONDARY_FORM parentForm=\"" + mainFormName + "\">";
 
@@ -805,13 +804,13 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
       existQuery += " let $sorted_" + formName + "_results :=";
 
       existQuery +=
-          " for $"
-              + formName
-              + " in collection(\"/db/orbeon/fr/"
-              + applicationName
-              + "/"
-              + formName
-              + "/data\")";
+        " for $" +
+        formName +
+        " in collection(\"/db/orbeon/fr/" +
+        applicationName +
+        "/" +
+        formName +
+        "/data\")";
 
       String equalsFormDesignName = equalsFormName;
 
@@ -822,22 +821,22 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
       // equalsFieldSetting.getParentGridSetting().getParentSectionSetting().getParentFormSetting().getDesignName();
       // DebugUtility.debug("existBuildViewQuery 5:"+whereFieldSetting.getFieldType());
       // Where
-      if (whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1
-          || whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1
-          || whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE
-          || whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1
-          || whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI
-          || whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI
-          || whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK
-          || whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER
-          || whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES
-          || whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
+      if (whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1 ||
+        whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1 ||
+        whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE ||
+        whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1 ||
+        whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI ||
+        whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI ||
+        whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK ||
+        whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER ||
+        whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES ||
+        whereFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
         existQuery +=
-            " where $"
-                + formName
-                + "//"
-                + whereFieldSetting.getDesignName()
-                + "_SECTION-iteration/SYS_KEYWORD_OPTION_VALUE ";
+          " where $" +
+          formName +
+          "//" +
+          whereFieldSetting.getDesignName() +
+          "_SECTION-iteration/SYS_KEYWORD_OPTION_VALUE ";
 
       } else {
         existQuery += " where $" + formName + "//" + whereFieldSetting.getDesignName();
@@ -846,23 +845,23 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
 
       // DebugUtility.debug("existBuildViewQuery 6:"+equalsFieldSetting.getFieldType());
 
-      if (equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1
-          || equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1
-          || equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE
-          || equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1
-          || equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI
-          || equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI
-          || equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK
-          || equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER
-          || equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES
-          || equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
+      if (equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1 ||
+        equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1 ||
+        equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE ||
+        equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1 ||
+        equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI ||
+        equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI ||
+        equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK ||
+        equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER ||
+        equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES ||
+        equalsFieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
 
         existQuery +=
-            " = $"
-                + equalsFormDesignName
-                + "//"
-                + equalsFieldSetting.getDesignName()
-                + "_SECTION-iteration/SYS_KEYWORD_OPTION_VALUE ";
+          " = $" +
+          equalsFormDesignName +
+          "//" +
+          equalsFieldSetting.getDesignName() +
+          "_SECTION-iteration/SYS_KEYWORD_OPTION_VALUE ";
 
       } else {
         existQuery += " = $" + equalsFormDesignName + "//" + equalsFieldSetting.getDesignName();
@@ -921,13 +920,13 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
         String designName = fieldSetting.getDesignName();
 
         existQuery +=
-            " <SYS_VIEW_COLUMN name=\""
-                + designName
-                + "\" type=\""
-                + fieldSetting.getFieldType()
-                + "\"  isNames=\""
-                + fieldSetting.isNamesField()
-                + "\">";
+          " <SYS_VIEW_COLUMN name=\"" +
+          designName +
+          "\" type=\"" +
+          fieldSetting.getFieldType() +
+          "\"  isNames=\"" +
+          fieldSetting.isNamesField() +
+          "\">";
         existQuery += " <SYS_VIEW_COLUMN-iteration>";
         // Actual Value
         existQuery += " <SYS_VIEW_COLUMN_VALUE/>";
@@ -958,13 +957,13 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
       String designName = fieldSetting.getDesignName();
 
       existQuery +=
-          " <SYS_VIEW_COLUMN name=\""
-              + designName
-              + "\" type=\""
-              + fieldSetting.getFieldType()
-              + "\"  isNames=\""
-              + fieldSetting.isNamesField()
-              + "\">";
+        " <SYS_VIEW_COLUMN name=\"" +
+        designName +
+        "\" type=\"" +
+        fieldSetting.getFieldType() +
+        "\"  isNames=\"" +
+        fieldSetting.isNamesField() +
+        "\">";
       existQuery += " <SYS_VIEW_COLUMN-iteration>";
       // If the field is a keyword field then the result will come from its dynamic section
       // DebugUtility.debug("Build View Query 1");
@@ -974,63 +973,63 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
 
         // DebugUtility.debug("Build View Query 3");
         existQuery +=
-            " <SYS_VIEW_COLUMN_VALUE>{"
-                + "let $SYS_VIEW_COLUMN_VALUE_RESULTS := "
-                + "$"
-                + formName
-                + "//"
-                + designName
-                + "_SECTION-iteration "
-                + "\n\r "
-                + ""
-                + " return"
-                + " ";
+          " <SYS_VIEW_COLUMN_VALUE>{" +
+          "let $SYS_VIEW_COLUMN_VALUE_RESULTS := " +
+          "$" +
+          formName +
+          "//" +
+          designName +
+          "_SECTION-iteration " +
+          "\n\r " +
+          "" +
+          " return" +
+          " ";
 
-        if (fieldSetting.isNamesField()
-            && expandFieldList != null
-            && expandFieldList.contains(Long.toString(fieldSetting.getFieldID()))) {
+        if (fieldSetting.isNamesField() &&
+          expandFieldList != null &&
+          expandFieldList.contains(Long.toString(fieldSetting.getFieldID()))) {
           // DebugUtility.debug("Build View Query 4");
           existQuery +=
-              " for $SYS_VIEW_COLUMN_VALUE_RESULT in $SYS_VIEW_COLUMN_VALUE_RESULTS "
-                  + "return (let $allusers := local:getUsers($SYS_VIEW_COLUMN_VALUE_RESULT//SYS_KEYWORD_OPTION_VALUE/text())//SYS_DOCUMENT_ID/text() "
-                  + "return for $user in $allusers return concat($user,';')) "
-                  + "}</SYS_VIEW_COLUMN_VALUE>";
+            " for $SYS_VIEW_COLUMN_VALUE_RESULT in $SYS_VIEW_COLUMN_VALUE_RESULTS " +
+            "return (let $allusers := local:getUsers($SYS_VIEW_COLUMN_VALUE_RESULT//SYS_KEYWORD_OPTION_VALUE/text())//SYS_DOCUMENT_ID/text() " +
+            "return for $user in $allusers return concat($user,';')) " +
+            "}</SYS_VIEW_COLUMN_VALUE>";
         } else {
           // DebugUtility.debug("Build View Query 5");
           existQuery +=
-              " if(count($SYS_VIEW_COLUMN_VALUE_RESULTS) = 1) then for $SYS_VIEW_COLUMN_VALUE_RESULT in $SYS_VIEW_COLUMN_VALUE_RESULTS return $SYS_VIEW_COLUMN_VALUE_RESULT//SYS_KEYWORD_OPTION_VALUE/text()"
-                  + " else for $SYS_VIEW_COLUMN_VALUE_RESULT in $SYS_VIEW_COLUMN_VALUE_RESULTS return concat($SYS_VIEW_COLUMN_VALUE_RESULT//SYS_KEYWORD_OPTION_VALUE/text(),';')"
-                  + "}</SYS_VIEW_COLUMN_VALUE>";
+            " if(count($SYS_VIEW_COLUMN_VALUE_RESULTS) = 1) then for $SYS_VIEW_COLUMN_VALUE_RESULT in $SYS_VIEW_COLUMN_VALUE_RESULTS return $SYS_VIEW_COLUMN_VALUE_RESULT//SYS_KEYWORD_OPTION_VALUE/text()" +
+            " else for $SYS_VIEW_COLUMN_VALUE_RESULT in $SYS_VIEW_COLUMN_VALUE_RESULTS return concat($SYS_VIEW_COLUMN_VALUE_RESULT//SYS_KEYWORD_OPTION_VALUE/text(),';')" +
+            "}</SYS_VIEW_COLUMN_VALUE>";
         }
 
         // Display Value
         // DebugUtility.debug("Build View Query 7");
         existQuery +=
-            " <SYS_VIEW_COLUMN_DISPLAY_VALUE>{"
-                + "let $SYS_VIEW_COLUMN_VALUE_RESULTS := "
-                + "$"
-                + formName
-                + "//"
-                + designName
-                + "_SECTION-iteration "
-                + "\n\r"
-                + " return"
-                + " ";
-        if (fieldSetting.isNamesField()
-            && expandFieldList != null
-            && expandFieldList.contains(Long.toString(fieldSetting.getFieldID()))) {
+          " <SYS_VIEW_COLUMN_DISPLAY_VALUE>{" +
+          "let $SYS_VIEW_COLUMN_VALUE_RESULTS := " +
+          "$" +
+          formName +
+          "//" +
+          designName +
+          "_SECTION-iteration " +
+          "\n\r" +
+          " return" +
+          " ";
+        if (fieldSetting.isNamesField() &&
+          expandFieldList != null &&
+          expandFieldList.contains(Long.toString(fieldSetting.getFieldID()))) {
           // DebugUtility.debug("Build View Query 8");
           existQuery +=
-              " for $SYS_VIEW_COLUMN_VALUE_RESULT in $SYS_VIEW_COLUMN_VALUE_RESULTS "
-                  + "return (let $allusers := local:getUsers($SYS_VIEW_COLUMN_VALUE_RESULT//SYS_KEYWORD_OPTION_VALUE/text())//SYS_USER_DISPLAY_NAME "
-                  + "return for $user in $allusers return concat($user,';')) "
-                  + "}</SYS_VIEW_COLUMN_DISPLAY_VALUE>";
+            " for $SYS_VIEW_COLUMN_VALUE_RESULT in $SYS_VIEW_COLUMN_VALUE_RESULTS " +
+            "return (let $allusers := local:getUsers($SYS_VIEW_COLUMN_VALUE_RESULT//SYS_KEYWORD_OPTION_VALUE/text())//SYS_USER_DISPLAY_NAME " +
+            "return for $user in $allusers return concat($user,';')) " +
+            "}</SYS_VIEW_COLUMN_DISPLAY_VALUE>";
         } else {
           // DebugUtility.debug("Build View Query 9");
           existQuery +=
-              " if(count($SYS_VIEW_COLUMN_VALUE_RESULTS) = 1) then for $SYS_VIEW_COLUMN_VALUE_RESULT in $SYS_VIEW_COLUMN_VALUE_RESULTS return $SYS_VIEW_COLUMN_VALUE_RESULT//SYS_KEYWORD_OPTION_LABEL/text()"
-                  + " else for $SYS_VIEW_COLUMN_VALUE_RESULT in $SYS_VIEW_COLUMN_VALUE_RESULTS return concat($SYS_VIEW_COLUMN_VALUE_RESULT//SYS_KEYWORD_OPTION_LABEL/text(),';')"
-                  + "}</SYS_VIEW_COLUMN_DISPLAY_VALUE>";
+            " if(count($SYS_VIEW_COLUMN_VALUE_RESULTS) = 1) then for $SYS_VIEW_COLUMN_VALUE_RESULT in $SYS_VIEW_COLUMN_VALUE_RESULTS return $SYS_VIEW_COLUMN_VALUE_RESULT//SYS_KEYWORD_OPTION_LABEL/text()" +
+            " else for $SYS_VIEW_COLUMN_VALUE_RESULT in $SYS_VIEW_COLUMN_VALUE_RESULTS return concat($SYS_VIEW_COLUMN_VALUE_RESULT//SYS_KEYWORD_OPTION_LABEL/text(),';')" +
+            "}</SYS_VIEW_COLUMN_DISPLAY_VALUE>";
         }
 
         // *************OLD IMPLEMENTATION*********************//
@@ -1120,27 +1119,27 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
         // Actual Value is the same as Display Value
         // if the field is an attachment then get the display value as the file name
         existQuery +=
-            " <SYS_VIEW_COLUMN_VALUE>{data($"
-                + formName
-                + "//"
-                + fieldPrefix
-                + designName
-                + ")}</SYS_VIEW_COLUMN_VALUE>";
+          " <SYS_VIEW_COLUMN_VALUE>{data($" +
+          formName +
+          "//" +
+          fieldPrefix +
+          designName +
+          ")}</SYS_VIEW_COLUMN_VALUE>";
         if (fieldSetting.getFieldType() == 20) {
           existQuery +=
-              " <SYS_VIEW_COLUMN_DISPLAY_VALUE>{data($"
-                  + formName
-                  + "//"
-                  + designName
-                  + "/@filename)}</SYS_VIEW_COLUMN_DISPLAY_VALUE>";
+            " <SYS_VIEW_COLUMN_DISPLAY_VALUE>{data($" +
+            formName +
+            "//" +
+            designName +
+            "/@filename)}</SYS_VIEW_COLUMN_DISPLAY_VALUE>";
         } else
           existQuery +=
-              " <SYS_VIEW_COLUMN_DISPLAY_VALUE>{data($"
-                  + formName
-                  + "//"
-                  + fieldPrefix
-                  + designName
-                  + ")}</SYS_VIEW_COLUMN_DISPLAY_VALUE>";
+          " <SYS_VIEW_COLUMN_DISPLAY_VALUE>{data($" +
+          formName +
+          "//" +
+          fieldPrefix +
+          designName +
+          ")}</SYS_VIEW_COLUMN_DISPLAY_VALUE>";
       }
 
       existQuery += " </SYS_VIEW_COLUMN-iteration>";
@@ -1173,7 +1172,7 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
 
       try {
         (new SessionUtility())
-            .connectToLiferayAndExecute("REFRESH_VIEW_CACHE", document.getDocumentID(), "");
+        .connectToLiferayAndExecute("REFRESH_VIEW_CACHE", document.getDocumentID(), "");
       } catch (Exception e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
@@ -1189,10 +1188,10 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
     Section viewAdvancedSearchSection = document.getSectionFromMap("SYS_VIEW_SETTING_DETAILS");
 
     Section columnsSection = document.getSectionFromMap("SYS_VIEW_SETTING_COLUMNS");
-    Collection<SectionRecord> columnRecords = columnsSection.getSectionRecords();
+    Collection < SectionRecord > columnRecords = columnsSection.getSectionRecords();
 
-    LinkedList<FieldSetting> fieldNamesList = null;
-    TreeMap<String, FieldSetting> orderedFieldNamesList = null;
+    LinkedList < FieldSetting > fieldNamesList = null;
+    TreeMap < String, FieldSetting > orderedFieldNamesList = null;
 
     SettingManager sm = SettingManager.getSettingManager();
 
@@ -1207,14 +1206,14 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
         // DebugUtility.debug("View Setting on save 1.2:");
         FormSetting formSetting = sm.getFormSetting(new Long(formID));
         if (formSetting != null) {
-          Collection<SectionSetting> formSections = formSetting.getSectionSettings();
-          for (SectionSetting formSection : formSections) {
-            Collection<FieldSetting> fieldSettings = formSection.getFieldSettings();
+          Collection < SectionSetting > formSections = formSetting.getSectionSettings();
+          for (SectionSetting formSection: formSections) {
+            Collection < FieldSetting > fieldSettings = formSection.getFieldSettings();
 
             if (orderedFieldNamesList == null) orderedFieldNamesList = new TreeMap();
 
             if (fieldSettings != null)
-              for (FieldSetting fieldSetting : fieldSettings) {
+              for (FieldSetting fieldSetting: fieldSettings) {
                 String putName = fieldSetting.getDisplayName() + "_" + fieldSetting.getDesignName();
                 orderedFieldNamesList.put(putName, fieldSetting);
               }
@@ -1227,9 +1226,9 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
 
     if (columnRecords != null) {
       try {
-        for (SectionRecord columnRecord : columnRecords) {
+        for (SectionRecord columnRecord: columnRecords) {
           String fieldIDText =
-              columnRecord.getFieldFromMap("SYS_VIEW_SETTING_FIELD_NAME").getValuesAsText();
+            columnRecord.getFieldFromMap("SYS_VIEW_SETTING_FIELD_NAME").getValuesAsText();
           if (!fieldIDText.equals("")) {
             Long keyID = Long.parseLong(fieldIDText);
             FieldSetting fieldSetting = sm.getFieldSetting(keyID);
@@ -1244,11 +1243,11 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
     }
 
     if (orderedFieldNamesList != null) {
-      Collection<FieldSetting> fieldsForSearch = orderedFieldNamesList.values();
+      Collection < FieldSetting > fieldsForSearch = orderedFieldNamesList.values();
 
       if (fieldNamesList == null) fieldNamesList = new LinkedList();
 
-      for (FieldSetting fieldForSearch : fieldsForSearch) fieldNamesList.add(fieldForSearch);
+      for (FieldSetting fieldForSearch: fieldsForSearch) fieldNamesList.add(fieldForSearch);
     }
 
     // DebugUtility.debug("PERFORMANCE DEBUG DOCUMENT ON OPEN VIEW START 6: time:"+new
@@ -1257,9 +1256,9 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
     if (viewAdvancedSearchSection != null) {
       // DebugUtility.debug("Open View set search options 2");
       Grid viewAdvancedSearchGrid =
-          viewAdvancedSearchSection.getGridFromMap("SYS_VIEW_SETTING_ADVANCED_SEARCH_GRID");
+        viewAdvancedSearchSection.getGridFromMap("SYS_VIEW_SETTING_ADVANCED_SEARCH_GRID");
 
-      Collection<GridRecord> gridRecords = viewAdvancedSearchGrid.getGridRecords();
+      Collection < GridRecord > gridRecords = viewAdvancedSearchGrid.getGridRecords();
       int gridRecordCount = 0;
 
       if (gridRecords == null) {
@@ -1268,22 +1267,22 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
       }
 
       if (gridRecords != null)
-        for (GridRecord gridRecord : gridRecords) {
+        for (GridRecord gridRecord: gridRecords) {
           gridRecordCount++;
 
           // DebugUtility.debug("Open View set search options 3");
           SingleSelectList joinField =
-              (SingleSelectList)
-                  gridRecord.getFieldFromMap("SYS_VIEW_SETTING_ADVANCED_SEARCH_JOIN");
+            (SingleSelectList)
+          gridRecord.getFieldFromMap("SYS_VIEW_SETTING_ADVANCED_SEARCH_JOIN");
           SingleSelectList fieldField =
-              (SingleSelectList)
-                  gridRecord.getFieldFromMap("SYS_VIEW_SETTING_ADVANCED_SEARCH_FIELD");
+            (SingleSelectList)
+          gridRecord.getFieldFromMap("SYS_VIEW_SETTING_ADVANCED_SEARCH_FIELD");
           SingleSelectList comparisonField =
-              (SingleSelectList)
-                  gridRecord.getFieldFromMap("SYS_VIEW_SETTING_ADVANCED_SEARCH_COMPARISON");
+            (SingleSelectList)
+          gridRecord.getFieldFromMap("SYS_VIEW_SETTING_ADVANCED_SEARCH_COMPARISON");
 
           // Set Join Options
-          ArrayList<KeywordOption> joinOptions = new ArrayList();
+          ArrayList < KeywordOption > joinOptions = new ArrayList();
           joinOptions.add(new KeywordOption("AND", "and", false));
           joinOptions.add(new KeywordOption("OR", "or", false));
           joinField.setKeywordOptions(joinOptions);
@@ -1292,7 +1291,7 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
           if (gridRecordCount == 1) joinField.setKeywordValuesUsingLabel("AND");
 
           // Set comparison Options
-          ArrayList<KeywordOption> comparisonOptions = new ArrayList();
+          ArrayList < KeywordOption > comparisonOptions = new ArrayList();
           comparisonOptions.add(new KeywordOption("CONTAINS", "matches", false));
           comparisonOptions.add(new KeywordOption("EQUAL TO", "=", false));
           comparisonOptions.add(new KeywordOption("NOT EQUAL TO", "!=", false));
@@ -1305,27 +1304,27 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
           // Set field options
           if (fieldNamesList != null) {
             // DebugUtility.debug("Open View set search options 4");
-            LinkedList<FieldSetting> fieldsList = fieldNamesList;
-            ArrayList<KeywordOption> fieldOptions = new ArrayList();
+            LinkedList < FieldSetting > fieldsList = fieldNamesList;
+            ArrayList < KeywordOption > fieldOptions = new ArrayList();
 
-            for (FieldSetting field : fieldsList) {
+            for (FieldSetting field: fieldsList) {
               int fieldType = field.getFieldType();
 
-              if (fieldType != FieldSetting.FIELD_TYPE_DATE_AND_TIME
-                  && fieldType != FieldSetting.FIELD_TYPE_DATE_FIELDS
-                  && fieldType != FieldSetting.FIELD_TYPE_DATE_ONLY
-                  && fieldType != FieldSetting.FIELD_TYPE_DROP_DOWN_DATE
-                  && fieldType != FieldSetting.FIELD_TYPE_TIME_ONLY) {
+              if (fieldType != FieldSetting.FIELD_TYPE_DATE_AND_TIME &&
+                fieldType != FieldSetting.FIELD_TYPE_DATE_FIELDS &&
+                fieldType != FieldSetting.FIELD_TYPE_DATE_ONLY &&
+                fieldType != FieldSetting.FIELD_TYPE_DROP_DOWN_DATE &&
+                fieldType != FieldSetting.FIELD_TYPE_TIME_ONLY) {
                 fieldType = 1;
               }
               // DebugUtility.debug("Open View set search options 5");
 
               // Training Status not searchable (for now)
               fieldOptions.add(
-                  new KeywordOption(
-                      field.getDisplayName() + " [" + field.getDesignName() + "]",
-                      field.getDesignName() + "_" + fieldType,
-                      false));
+                new KeywordOption(
+                  field.getDisplayName() + " [" + field.getDesignName() + "]",
+                  field.getDesignName() + "_" + fieldType,
+                  false));
             }
             // DebugUtility.debug("Open View set search options 6");
             fieldField.setKeywordOptions(fieldOptions);
@@ -1356,37 +1355,41 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
 
     return connectionDocument;
   }
-  // CALL THIS TO GET THE SQL VERSION OF THE XQUERY
-  // TO EXTRACT THE SQL CONVERSION CODE, COPY FROM THIS METHOD TO BEFORE this method
-  // joinRepeatSectionViewQuery()
-  public String buildSQLViewQuery(
-      String formName, LinkedList<FieldSetting> fieldNamesList, Document document) {
 
-    return sqlQuery(formName, fieldNamesList, document)
-        + " "
-        + sqlViewQuery(fieldNamesList, formName, document)
-        + " </SYS_VIEW_ROW-iteration>";
+  // Each SQLView Query consists of two main parts:
+  // Part1 : The SQL parts which is a SQL Query to build the table e.g: sql:execute($connection,"select  a0.SYS_DOCUMENT_ID, SYS_BUSINESS_NUMBER, SYS_DOCUMENT_LOCATIONS_VALUE, ...)
+  // The table is then stored in a xquery object, now we can loop each row and get the data.
+  // Part2 : Build a XML Template so we can inject the data into and display it afterwards
+  public String buildSQLViewQuery(
+    String formName, LinkedList < FieldSetting > fieldNamesList, Document document) {
+
+    return buildSQLQuery(formName, fieldNamesList, document) +
+      " " +
+      buildXMLTemplate(fieldNamesList, formName, document) +
+      " </SYS_VIEW_ROW-iteration>";
   }
 
-  private String sqlQuery(
-      String formName, LinkedList<FieldSetting> fieldNamesList, Document document) {
+  private String buildSQLQuery(
+    String formName, LinkedList < FieldSetting > fieldNamesList, Document document) {
 
     String establishConnectionQuery =
-        "let $connection := sql:get-connection(\"jdbc.default.driverClassName\", \"jdbc.default.url\", \"jdbc.default.username\", \"jdbc.default.password\") ";
+      "let $connection := sql:get-connection(\"jdbc.default.driverClassName\", \"jdbc.default.url\", \"jdbc.default.username\", \"jdbc.default.password\") ";
 
     String sql_results =
-        "let $sql_results := sql:execute($connection,\""
-            + sqlBuildCase12Query(document, fieldNamesList, formName)
-            + sqlBuildSystemsSeparateTableQuery(document, fieldNamesList, formName)
-            + sqlBuildCase3Query(formName, fieldNamesList)
-            + sqlBuildCase456789Query(document, formName)
-            + "\", fn:true())//sql:row ";
+      "let $sql_results := sql:execute($connection,\"" +
+      sqlBuildTopLevelQuery(document, fieldNamesList, formName) +
+      sqlBuildSystemFieldQuery(document, fieldNamesList, formName) +
+      sqlBuildMultivalueFieldQuery(formName, fieldNamesList) +
+      sqlBuildSeparateTableQuery(document, formName) +
+      "\", fn:true())//sql:row ";
 
-    return establishConnectionQuery + sql_results;
+    String result = establishConnectionQuery + sql_results;
+    return result;
   }
 
-  private String sqlBuildSystemsSeparateTableQuery(
-      Document document, LinkedList<FieldSetting> fieldNamesList, String formName) {
+  // build sql query for fields such as: SYS_COMMENTS, SYS_TASK_HISTORY,...
+  private String sqlBuildSystemFieldQuery(
+    Document document, LinkedList < FieldSetting > fieldNamesList, String formName) {
 
     StringBuilder sqlQuery = new StringBuilder();
 
@@ -1400,131 +1403,140 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
     boolean hasQueryTaskHistory = false;
     boolean hasQueryRevisionHistory = false;
 
-    for (FieldSetting fieldSetting : fieldNamesList) {
+    for (FieldSetting fieldSetting: fieldNamesList) {
       if (fieldSetting.getDesignName().contains("SYS_COMMENTS")) {
         hasQueryComment = true;
 
         sysCommentsField.append(
-            String.format(
-                ", group_concat(distinct %s separator ' | ') as %s",
-                fieldSetting.getDesignName(), fieldSetting.getDesignName()));
+          String.format(
+            ", group_concat(distinct %s separator ' | ') as %s",
+            fieldSetting.getDesignName(), fieldSetting.getDesignName()));
       } else if (fieldSetting.getDesignName().contains("SYS_TASK_HISTORY")) {
         hasQueryTaskHistory = true;
         sysTaskHistory.append(
-            String.format(
-                ", group_concat(distinct %s separator ' | ') as %s",
-                fieldSetting.getDesignName(), fieldSetting.getDesignName()));
+          String.format(
+            ", group_concat(distinct %s separator ' | ') as %s",
+            fieldSetting.getDesignName(), fieldSetting.getDesignName()));
       } else if (fieldSetting.getDesignName().contains("SYS_REVISION_HISTORY")) {
         hasQueryRevisionHistory = true;
         sysRevisionHistory.append(
-            String.format(
-                ", group_concat(distinct %s separator ' | ') as %s",
-                fieldSetting.getDesignName(), fieldSetting.getDesignName()));
+          String.format(
+            ", group_concat(distinct %s separator ' | ') as %s",
+            fieldSetting.getDesignName(), fieldSetting.getDesignName()));
       }
     }
 
     if (hasQueryComment) {
       String tableAlias = "abcd" + UUID.randomUUID().toString().replaceAll("-", "");
       sqlQuery.append(
-          String.format(
-              " LEFT JOIN (SELECT %s FROM %s  group by sys_document_id) as %s ON a0.sys_document_id = %s.sys_document_id ",
-              sysCommentsField.toString(),
-              formName.toLowerCase() + "_sys_comments",
-              tableAlias,
-              tableAlias));
+        String.format(
+          " LEFT JOIN (SELECT %s FROM %s  group by sys_document_id) as %s ON a0.sys_document_id = %s.sys_document_id ",
+          sysCommentsField.toString(),
+          formName.toLowerCase() + "_sys_comments",
+          tableAlias,
+          tableAlias));
     }
 
     if (hasQueryTaskHistory) {
       String tableAlias = "abcd" + UUID.randomUUID().toString().replaceAll("-", "");
       sqlQuery.append(
-          String.format(
-              " LEFT JOIN (SELECT %s FROM %s group by sys_document_id) as %s ON a0.sys_document_id = %s.sys_document_id ",
-              sysTaskHistory.toString(),
-              formName.toLowerCase() + "_sys_task_history",
-              tableAlias,
-              tableAlias));
+        String.format(
+          " LEFT JOIN (SELECT %s FROM %s group by sys_document_id) as %s ON a0.sys_document_id = %s.sys_document_id ",
+          sysTaskHistory.toString(),
+          formName.toLowerCase() + "_sys_task_history",
+          tableAlias,
+          tableAlias));
     }
 
     if (hasQueryRevisionHistory) {
       String tableAlias = "abcd" + UUID.randomUUID().toString().replaceAll("-", "");
       sqlQuery.append(
-          String.format(
-              " LEFT JOIN (SELECT %s FROM %s group by sys_document_id) as %s ON a0.sys_document_id = %s.sys_document_id ",
-              sysCommentsField.toString(),
-              formName.toLowerCase() + "_sys_revision_history",
-              tableAlias,
-              tableAlias));
+        String.format(
+          " LEFT JOIN (SELECT %s FROM %s group by sys_document_id) as %s ON a0.sys_document_id = %s.sys_document_id ",
+          sysCommentsField.toString(),
+          formName.toLowerCase() + "_sys_revision_history",
+          tableAlias,
+          tableAlias));
     }
 
     return sqlQuery.toString();
   }
 
-  private String sqlBuildCase12Query(
-      Document document, LinkedList<FieldSetting> fieldNamesList, String formName) {
+  // build sql query at the top level, this contains all the select 
+  private String sqlBuildTopLevelQuery(
+    Document document, LinkedList < FieldSetting > fieldNamesList, String formName) {
     String sqlQuery = "";
     StringBuilder fields = new StringBuilder();
     fields.append(" a0.SYS_DOCUMENT_ID");
 
-    for (FieldSetting fieldSetting : fieldNamesList) {
+    for (FieldSetting fieldSetting: fieldNamesList) {
 
-      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
+
+      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
+
+        // mysql fields do not have the form name prefix remove it and it is option-type field => has value and display
         fields.append(
-            String.format(
-                ", %s, %s",
-                fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "") + "_VALUE",
-                fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "") + "_DISPLAY"));
+          String.format(
+            ", %s, %s",
+            fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "") + "_VALUE",
+            fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "") + "_DISPLAY"));
       } else if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATE_AND_TIME) {
+
+        // handle datetime in a special way
         fields.append(
-            String.format(
-                ",date_format(%s, '%s') as %s",
-                fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", ""),
-                "%Y-%m-%dT%H:%i:%s",
-                fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "")));
+          String.format(
+            ",date_format(%s, '%s') as %s",
+            fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", ""),
+            "%Y-%m-%dT%H:%i:%s",
+            fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "")));
       } else {
-      
-      String fieldDesignName = fieldSetting.getDesignName();
-      if(fieldDesignName.equals("TRAINING_EXAM_PLAN_DESC")){
-        fieldDesignName = "TRAINING_EXAM_PLAN_DESCRIPTION";
-    }
+
+
+        String fieldDesignName = fieldSetting.getDesignName();
+        if (fieldDesignName.equals("TRAINING_EXAM_PLAN_DESC")) {
+          fieldDesignName = "TRAINING_EXAM_PLAN_DESCRIPTION";
+        }
+
+        // other fields
         fields.append(
-            String.format(", %s", fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "")));
+          String.format(", %s", fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "")));
       }
     }
     try {
 
       SettingManager sm = SettingManager.getSettingManager();
       Section secondaryFormSection = document.getSectionFromMap("SYS_VIEW_SETTING_REP_FIELDS");
-      LinkedList<FieldSetting> fieldNamesListSection = null;
+      LinkedList < FieldSetting > fieldNamesListSection = null;
 
       if (secondaryFormSection != null) {
-        Collection<SectionRecord> secondaryFormRecordCol = secondaryFormSection.getSectionRecords();
+        Collection < SectionRecord > secondaryFormRecordCol = secondaryFormSection.getSectionRecords();
         if (secondaryFormRecordCol != null) {
-          for (SectionRecord secondaryFormRecord : secondaryFormRecordCol) {
+          for (SectionRecord secondaryFormRecord: secondaryFormRecordCol) {
             String repeaterName =
-                secondaryFormRecord
-                    .getFieldFromMap("SYS_VIEW_SETTING_REP_SEC_NAME")
-                    .getValuesAsDisplayText();
+              secondaryFormRecord
+              .getFieldFromMap("SYS_VIEW_SETTING_REP_SEC_NAME")
+              .getValuesAsDisplayText();
             if (repeaterName != null && !repeaterName.equals("")) {
               // there is repeated section
               Grid columnGrid =
-                  secondaryFormRecord.getGridFromMap("SYS_VIEW_SETTING_REP_FIELDS_SELECTION");
+                secondaryFormRecord.getGridFromMap("SYS_VIEW_SETTING_REP_FIELDS_SELECTION");
               if (columnGrid != null) {
-                Collection<GridRecord> columnRecords = columnGrid.getGridRecords();
+                Collection < GridRecord > columnRecords = columnGrid.getGridRecords();
                 if (columnRecords != null) {
                   boolean hasFieldToQuery = false;
-                  for (GridRecord columnRecord : columnRecords) {
+                  for (GridRecord columnRecord: columnRecords) {
                     AutoCompleteList fieldIDField =
-                        (AutoCompleteList)
-                            columnRecord.getFieldFromMap("SYS_VIEW_SETTING_REP_FIELDS_FIELD_NAME");
+                      (AutoCompleteList)
+                    columnRecord.getFieldFromMap("SYS_VIEW_SETTING_REP_FIELDS_FIELD_NAME");
                     String fieldID = fieldIDField.getValuesAsText();
 
                     FieldSetting fieldSetting = sm.getFieldSetting(new Long(fieldID));
@@ -1536,46 +1548,45 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
                   }
                   if (hasFieldToQuery) {
 
-                    for (FieldSetting fieldSetting : fieldNamesListSection) {
-                      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE
-                          || fieldSetting.getFieldType()
-                              == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER
-                          || fieldSetting.getFieldType()
-                              == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES
-                          || fieldSetting.getFieldType()
-                              == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
+                    for (FieldSetting fieldSetting: fieldNamesListSection) {
+                      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1 ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1 ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE ||
+                        fieldSetting.getFieldType() ==
+                        FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1 ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER ||
+                        fieldSetting.getFieldType() ==
+                        FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES ||
+                        fieldSetting.getFieldType() ==
+                        FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
                         fields.append(
-                            String.format(
-                                ", %s, %s",
-                                fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "") + "_VALUE",
-                                fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "")
-                                    + "_DISPLAY"));
-                      } else if (fieldSetting.getFieldType()
-                          == FieldSetting.FIELD_TYPE_DATE_AND_TIME) {
+                          String.format(
+                            ", %s, %s",
+                            fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "") + "_VALUE",
+                            fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "") +
+                            "_DISPLAY"));
+                      } else if (fieldSetting.getFieldType() ==
+                        FieldSetting.FIELD_TYPE_DATE_AND_TIME) {
                         fields.append(
-                            String.format(
-                                ",date_format(%s, '%s') as %s",
-                                fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", ""),
-                                "%Y-%m-%dT%H:%i:%s",
-                                fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "")));
-                      } else if(fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_ATTACHMENT){
+                          String.format(
+                            ",date_format(%s, '%s') as %s",
+                            fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", ""),
+                            "%Y-%m-%dT%H:%i:%s",
+                            fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "")));
+                      } else if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_ATTACHMENT) {
 
                         String prefix = formName.toUpperCase() + "_";
-                        String fieldName = fieldSetting.getDesignName().replaceAll(prefix,"");
+                        String fieldName = fieldSetting.getDesignName().replaceAll(prefix, "");
                         fields.append(
-                            String.format(
-                                ", %s", fieldName));
-                      }else {
-                        //DebugUtility.debug("DEBUG ATTACHMENT " + fieldSetting.getDesignName() + " "+ formName);
+                          String.format(
+                            ", %s", fieldName));
+                      } else {
                         fields.append(
-                            String.format(
-                                ", %s", fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "")));
+                          String.format(
+                            ", %s", fieldSetting.getDesignName().replace(formName.toUpperCase() + "_", "")));
                       }
                     }
                   }
@@ -1595,37 +1606,39 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
 
     sqlQuery = String.format("select %s from %s as a0 ", fields, formName.toLowerCase());
     return sqlQuery;
-  }
+  } 
 
-  private String sqlBuildCase3Query(String formName, LinkedList<FieldSetting> fieldNamesList) {
+
+  // multivalue field is treated as a separate table hence need JOIN
+  private String sqlBuildMultivalueFieldQuery(String formName, LinkedList < FieldSetting > fieldNamesList) {
 
     StringBuilder sqlQuery = new StringBuilder();
 
-    for (FieldSetting fieldSetting : fieldNamesList) {
+    for (FieldSetting fieldSetting: fieldNamesList) {
       // recheck here about radio button
-      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
+      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
 
         String multiValueAlias = "abcd" + UUID.randomUUID().toString().replaceAll("-", "");
 
         sqlQuery.append(
-            String.format(
-                " LEFT JOIN %s ",
-                sqlBuildMultivalueTableQueryHelper(fieldSetting,
-                    formName, fieldSetting.getDesignName(), multiValueAlias)));
+          String.format(
+            " LEFT JOIN %s ",
+            sqlBuildMultivalueTableQueryHelper(fieldSetting,
+              formName, fieldSetting.getDesignName(), multiValueAlias)));
       }
     }
 
     return sqlQuery.toString();
   }
 
-  // Build the query for multivalue table
+  // Build the query for multivalue table - a helper 
   private String sqlBuildMultivalueTableQueryHelper(FieldSetting fieldSetting,
-      String formName, String multiValueName, String tableAlias) {
+    String formName, String multiValueName, String tableAlias) {
 
     // multivalue field for system field because system field will not have the formname before it
     // for example SYS_PROCESS_TASK_ASSIGNED_TO
@@ -1634,27 +1647,34 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
     }
 
     String resultQuery =
-        String.format(
-            "(select SYS_DOCUMENT_ID,GROUP_CONCAT(DISTINCT %s_VALUE SEPARATOR '; ') as %s_VALUE, GROUP_CONCAT(DISTINCT %s_DISPLAY SEPARATOR '; ') as %s_DISPLAY\r\nfrom %s GROUP BY SYS_DOCUMENT_ID) as %s ON\r\na0.SYS_DOCUMENT_ID = %s.SYS_DOCUMENT_ID",
-            multiValueName.replaceAll(formName.toUpperCase() + "_", ""),
-            multiValueName.replaceAll(formName.toUpperCase() + "_", ""),
-            multiValueName.replaceAll(formName.toUpperCase() + "_", ""),
-            multiValueName.replaceAll(formName.toUpperCase() + "_", ""),
-            multiValueName.toLowerCase(),
-            tableAlias,
-            tableAlias);
+      String.format(
+        "(select SYS_DOCUMENT_ID,GROUP_CONCAT(DISTINCT %s_VALUE SEPARATOR '; ') as %s_VALUE, GROUP_CONCAT(DISTINCT %s_DISPLAY SEPARATOR '; ') as %s_DISPLAY\r\nfrom %s GROUP BY SYS_DOCUMENT_ID) as %s ON\r\na0.SYS_DOCUMENT_ID = %s.SYS_DOCUMENT_ID",
+        multiValueName.replaceAll(formName.toUpperCase() + "_", ""),
+        multiValueName.replaceAll(formName.toUpperCase() + "_", ""),
+        multiValueName.replaceAll(formName.toUpperCase() + "_", ""),
+        multiValueName.replaceAll(formName.toUpperCase() + "_", ""),
+        multiValueName.toLowerCase(),
+        tableAlias,
+        tableAlias);
 
-  //DebugUtility.debug("THE RESULT QUERY IS: " + resultQuery);
+    //DebugUtility.debug("THE RESULT QUERY IS: " + resultQuery);
 
     return resultQuery;
   }
 
-  private String sqlBuildCase456789Query(Document document, String formName) {
+  // build sql query for fields that are in the tables which are not in the main table, these include those cases:
+  // Case 4: normal fields in repeated grid
+  // Case 5: normal fields in repeated section
+  // Case 6: multivalue field in repeated grid
+  // Case 7: multivalue field in repeated section
+  // Case 8: normal field in repeated grid under repeated section
+  // Case 9: multivalue field in repeated grid under repeated section
+  private String sqlBuildSeparateTableQuery(Document document, String formName) {
     String sqlQuery = "";
-    boolean isCase67 = false;
-    boolean isCase8 = false;
-    boolean isCase9 = false;
-    LinkedList<FieldSetting> fieldNamesList = null;
+    boolean hasMultivalueFieldInRepeatedGridOrSection = false;
+    boolean hasNormalFieldUnderRepeatedGridUnderRepeatedSection = false;
+    boolean hasMultivalueFieldUnderRepeatedGridUnderRepeatedSection = false;
+    LinkedList < FieldSetting > fieldNamesList = null;
     String repeatedSectionOrGridName = "";
     String tableAlias = "abcd" + UUID.randomUUID().toString().replaceAll("-", "");
 
@@ -1664,25 +1684,25 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
       Section secondaryFormSection = document.getSectionFromMap("SYS_VIEW_SETTING_REP_FIELDS");
 
       if (secondaryFormSection != null) {
-        Collection<SectionRecord> secondaryFormRecordCol = secondaryFormSection.getSectionRecords();
+        Collection < SectionRecord > secondaryFormRecordCol = secondaryFormSection.getSectionRecords();
         if (secondaryFormRecordCol != null) {
-          for (SectionRecord secondaryFormRecord : secondaryFormRecordCol) {
+          for (SectionRecord secondaryFormRecord: secondaryFormRecordCol) {
             String currentSQLQuery = "";
             repeatedSectionOrGridName =
-                secondaryFormRecord
-                    .getFieldFromMap("SYS_VIEW_SETTING_REP_SEC_NAME")
-                    .getValuesAsDisplayText();
+              secondaryFormRecord
+              .getFieldFromMap("SYS_VIEW_SETTING_REP_SEC_NAME")
+              .getValuesAsDisplayText();
             if (repeatedSectionOrGridName != null && !repeatedSectionOrGridName.equals("")) {
               Grid columnGrid =
-                  secondaryFormRecord.getGridFromMap("SYS_VIEW_SETTING_REP_FIELDS_SELECTION");
+                secondaryFormRecord.getGridFromMap("SYS_VIEW_SETTING_REP_FIELDS_SELECTION");
               if (columnGrid != null) {
-                Collection<GridRecord> columnRecords = columnGrid.getGridRecords();
+                Collection < GridRecord > columnRecords = columnGrid.getGridRecords();
                 if (columnRecords != null) {
                   boolean hasFieldToQuery = false;
-                  for (GridRecord columnRecord : columnRecords) {
+                  for (GridRecord columnRecord: columnRecords) {
                     AutoCompleteList fieldIDField =
-                        (AutoCompleteList)
-                            columnRecord.getFieldFromMap("SYS_VIEW_SETTING_REP_FIELDS_FIELD_NAME");
+                      (AutoCompleteList)
+                    columnRecord.getFieldFromMap("SYS_VIEW_SETTING_REP_FIELDS_FIELD_NAME");
                     String fieldID = fieldIDField.getValuesAsText();
 
                     FieldSetting fieldSetting = sm.getFieldSetting(new Long(fieldID));
@@ -1695,81 +1715,81 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
                   if (hasFieldToQuery) {
                     String queriedFields = "SYS_DOCUMENT_ID, ";
 
-                    for (FieldSetting fieldSetting : fieldNamesList) {
+                    for (FieldSetting fieldSetting: fieldNamesList) {
                       GridSetting parentGrid = fieldSetting.getParentGridSetting();
 
                       if (!parentGrid.getDesignName().contains(repeatedSectionOrGridName)) {
-                        isCase8 = true;
+                        hasNormalFieldUnderRepeatedGridUnderRepeatedSection = true;
                       }
 
-                      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE
-                          || fieldSetting.getFieldType()
-                              == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER
-                          || fieldSetting.getFieldType()
-                              == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES
-                          || fieldSetting.getFieldType()
-                              == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
-                        isCase67 = true;
+                      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1 ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1 ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE ||
+                        fieldSetting.getFieldType() ==
+                        FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1 ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER ||
+                        fieldSetting.getFieldType() ==
+                        FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES ||
+                        fieldSetting.getFieldType() ==
+                        FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
+                        hasMultivalueFieldInRepeatedGridOrSection = true;
                         parentGrid = fieldSetting.getParentGridSetting();
 
                         if (!parentGrid.getDesignName().contains(repeatedSectionOrGridName)) {
-                          isCase9 = true;
+                          hasMultivalueFieldUnderRepeatedGridUnderRepeatedSection = true;
                         }
                       } else {
-                        if (!isCase67 && !isCase8 && !isCase9) {
-                          if(fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_ATTACHMENT){
-                             String prefix = formName.toUpperCase() + "_";
-                             String fieldName = fieldSetting.getDesignName().replaceAll(prefix,"");
-                             queriedFields +=
-                                String.format(
-                                    "GROUP_CONCAT(DISTINCT %s SEPARATOR \'@@@\') as %s",
-                                    fieldName,
-                                    fieldName);
-                          } else{                         
+                        if (!hasMultivalueFieldInRepeatedGridOrSection && !hasNormalFieldUnderRepeatedGridUnderRepeatedSection && !hasMultivalueFieldUnderRepeatedGridUnderRepeatedSection) {
+                          if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_ATTACHMENT) {
+                            String prefix = formName.toUpperCase() + "_";
+                            String fieldName = fieldSetting.getDesignName().replaceAll(prefix, "");
                             queriedFields +=
-                                String.format(
-                                    "GROUP_CONCAT(DISTINCT %s SEPARATOR \'@@@\') as %s",
-                                    fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                                    fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
-                              }
+                              String.format(
+                                "GROUP_CONCAT(DISTINCT %s SEPARATOR \'@@@\') as %s",
+                                fieldName,
+                                fieldName);
+                          } else {
+                            queriedFields +=
+                              String.format(
+                                "GROUP_CONCAT(DISTINCT %s SEPARATOR \'@@@\') as %s",
+                                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+                                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
                           }
+                        }
                       }
                     }
 
                     // For each section
-                    if (!isCase67 && !isCase8 && !isCase9) {
+                    if (!hasMultivalueFieldInRepeatedGridOrSection && !hasNormalFieldUnderRepeatedGridUnderRepeatedSection && !hasMultivalueFieldUnderRepeatedGridUnderRepeatedSection) {
 
                       currentSQLQuery +=
-                          String.format(
-                              " LEFT JOIN (select %s\r\nfrom %s \r\nGROUP BY SYS_DOCUMENT_ID) as %s\r\nON a0.SYS_DOCUMENT_ID = %s.SYS_DOCUMENT_ID",
-                              queriedFields,
-                              repeatedSectionOrGridName.toLowerCase(),
-                              tableAlias,
-                              tableAlias);
+                        String.format(
+                          " LEFT JOIN (select %s\r\nfrom %s \r\nGROUP BY SYS_DOCUMENT_ID) as %s\r\nON a0.SYS_DOCUMENT_ID = %s.SYS_DOCUMENT_ID",
+                          queriedFields,
+                          repeatedSectionOrGridName.toLowerCase(),
+                          tableAlias,
+                          tableAlias);
                     }
 
                     // one level nested
-                    if (isCase67 && !isCase8 && !isCase9) {
+                    if (hasMultivalueFieldInRepeatedGridOrSection && !hasNormalFieldUnderRepeatedGridUnderRepeatedSection && !hasMultivalueFieldUnderRepeatedGridUnderRepeatedSection) {
                       currentSQLQuery =
-                          sqlBuildCase67Query(formName, fieldNamesList, repeatedSectionOrGridName);
+                        sqlBuildCase67Query(formName, fieldNamesList, repeatedSectionOrGridName);
                     }
 
                     // second level nested with normal fields
-                    if (isCase8 && !isCase9) {
+                    if (hasNormalFieldUnderRepeatedGridUnderRepeatedSection && !hasMultivalueFieldUnderRepeatedGridUnderRepeatedSection) {
                       currentSQLQuery =
-                          sqlBuildCase8Query(formName, fieldNamesList, repeatedSectionOrGridName);
+                        sqlBuildCase8Query(formName, fieldNamesList, repeatedSectionOrGridName);
                     }
 
                     // second level nested with multivalue fields
-                    if (isCase9) {
+                    if (hasMultivalueFieldUnderRepeatedGridUnderRepeatedSection) {
                       currentSQLQuery =
-                          sqlBuildCase9Query(formName, fieldNamesList, repeatedSectionOrGridName);
+                        sqlBuildCase9Query(formName, fieldNamesList, repeatedSectionOrGridName);
                     }
                   }
                 }
@@ -1792,7 +1812,7 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
   }
 
   private String sqlBuildCase67Query(
-      String formName, LinkedList<FieldSetting> fieldSettings, String repeatedSectionOrGridName) {
+    String formName, LinkedList < FieldSetting > fieldSettings, String repeatedSectionOrGridName) {
 
     String sqlQuery = "";
     String sqlMultiValueFieldTable = "";
@@ -1802,88 +1822,88 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
     StringBuilder queriedFields = new StringBuilder();
     StringBuilder multiValueQueriedFields = new StringBuilder();
 
-    List<String> sqlMultiValueFields =
-        new ArrayList<>(); // this helps deal with many multivalue fields
+    List < String > sqlMultiValueFields =
+      new ArrayList < > (); // this helps deal with many multivalue fields
 
     String multiValueTableName = "";
 
-    for (FieldSetting fieldSetting : fieldSettings) {
-      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
+    for (FieldSetting fieldSetting: fieldSettings) {
+      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
         queriedFields.append(
-            String.format(
-                " ,GROUP_CONCAT(DISTINCT %s SEPARATOR '@@@') as %s,GROUP_CONCAT(DISTINCT %s SEPARATOR '@@@') as %s ",
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY"));
+          String.format(
+            " ,GROUP_CONCAT(DISTINCT %s SEPARATOR '@@@') as %s,GROUP_CONCAT(DISTINCT %s SEPARATOR '@@@') as %s ",
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY"));
 
         multiValueQueriedFields.append(
-            String.format(
-                " %s_SYS_RECORD_ID ,GROUP_CONCAT(DISTINCT %s SEPARATOR '; ') as %s,GROUP_CONCAT(DISTINCT %s SEPARATOR '; ') as %s ",
-                repeatedSectionOrGridName.replaceAll(formName.toUpperCase() + "_", "").toLowerCase(),
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY"));
+          String.format(
+            " %s_SYS_RECORD_ID ,GROUP_CONCAT(DISTINCT %s SEPARATOR '; ') as %s,GROUP_CONCAT(DISTINCT %s SEPARATOR '; ') as %s ",
+            repeatedSectionOrGridName.replaceAll(formName.toUpperCase() + "_", "").toLowerCase(),
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY"));
         multiValueTableName = fieldSetting.getDesignName().replaceAll(formName + "_", "");
 
         sqlMultiValueFields.add(
-            String.format(
-                " LEFT JOIN (SELECT %s FROM %s GROUP BY %s_SYS_RECORD_ID) as %s ON  SYS_RECORD_ID = %s_SYS_RECORD_ID ",
-                multiValueQueriedFields,
-                formName.toLowerCase() + "_" + multiValueTableName.toLowerCase(),
-                repeatedSectionOrGridName.replaceAll(formName.toUpperCase() + "_", "").toLowerCase(),
-                sqlFirstNestedTableAlias,
-                repeatedSectionOrGridName.replaceAll(formName.toUpperCase() + "_", "").toLowerCase()));
+          String.format(
+            " LEFT JOIN (SELECT %s FROM %s GROUP BY %s_SYS_RECORD_ID) as %s ON  SYS_RECORD_ID = %s_SYS_RECORD_ID ",
+            multiValueQueriedFields,
+            formName.toLowerCase() + "_" + multiValueTableName.toLowerCase(),
+            repeatedSectionOrGridName.replaceAll(formName.toUpperCase() + "_", "").toLowerCase(),
+            sqlFirstNestedTableAlias,
+            repeatedSectionOrGridName.replaceAll(formName.toUpperCase() + "_", "").toLowerCase()));
       } else {
         queriedFields.append(
-            String.format(",%s ", fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "")));
+          String.format(",%s ", fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "")));
       }
     }
     String finalJoinSQLMultivalueFields = "";
-    for (String sql : sqlMultiValueFields) {
+    for (String sql: sqlMultiValueFields) {
       finalJoinSQLMultivalueFields += sql;
     }
 
     sqlSecondNestedTableQuery =
-        String.format(
-            " SELECT   %s.SYS_DOCUMENT_ID %s FROM \n%s as %s\n %s GROUP BY SYS_DOCUMENT_ID ",
-            sqlSecondNestedTableAlias,
-            queriedFields.toString(),
-            repeatedSectionOrGridName.toLowerCase(),
-            sqlSecondNestedTableAlias,
-            finalJoinSQLMultivalueFields);
+      String.format(
+        " SELECT   %s.SYS_DOCUMENT_ID %s FROM \n%s as %s\n %s GROUP BY SYS_DOCUMENT_ID ",
+        sqlSecondNestedTableAlias,
+        queriedFields.toString(),
+        repeatedSectionOrGridName.toLowerCase(),
+        sqlSecondNestedTableAlias,
+        finalJoinSQLMultivalueFields);
     String finalTableAlias = "abcd" + UUID.randomUUID().toString().replace("-", "");
     sqlQuery =
-        String.format(
-            " LEFT JOIN (%s) as %s ON\r\na0.SYS_DOCUMENT_ID = %s.SYS_DOCUMENT_ID ",
-            sqlSecondNestedTableQuery, finalTableAlias, finalTableAlias);
+      String.format(
+        " LEFT JOIN (%s) as %s ON\r\na0.SYS_DOCUMENT_ID = %s.SYS_DOCUMENT_ID ",
+        sqlSecondNestedTableQuery, finalTableAlias, finalTableAlias);
 
     return sqlQuery;
   }
 
   private String sqlBuildCase8Query(
-      String formName, LinkedList<FieldSetting> fieldSettings, String repeatedSectionOrGridName) {
+    String formName, LinkedList < FieldSetting > fieldSettings, String repeatedSectionOrGridName) {
 
-    List<String> multiValueFieldUnderSection = new ArrayList<>();
+    List < String > multiValueFieldUnderSection = new ArrayList < > ();
 
     String sqlMultiRepeatedGrid = "";
 
-    List<String> multiValueFields = new ArrayList<>();
-    Set<String> repeatedGrids = new HashSet<>();
-    Map<String, String> mapRepeatedGridAndFieldQueriedInRepeatedGrid = new HashMap<>();
+    List < String > multiValueFields = new ArrayList < > ();
+    Set < String > repeatedGrids = new HashSet < > ();
+    Map < String, String > mapRepeatedGridAndFieldQueriedInRepeatedGrid = new HashMap < > ();
     String normalFields = "SYS_DOCUMENT_ID ";
     String nestedFields = "SYS_DOCUMENT_ID ";
-    for (FieldSetting fieldSetting : fieldSettings) {
+    for (FieldSetting fieldSetting: fieldSettings) {
       boolean isNestedInGrid = false;
       GridSetting parentGrid = fieldSetting.getParentGridSetting();
       if (!parentGrid.getDesignName().contains(repeatedSectionOrGridName)) {
@@ -1891,136 +1911,136 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
         String repeatedGridName = parentGrid.getDesignName();
         if (!repeatedGrids.contains(repeatedGridName)) {
           mapRepeatedGridAndFieldQueriedInRepeatedGrid.put(
-              repeatedGridName,
-              String.format(
-                  " SECTION_SYS_RECORD_ID, GROUP_CONCAT(DISTINCT %s SEPARATOR  '     ') as %s ",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "")));
+            repeatedGridName,
+            String.format(
+              " SECTION_SYS_RECORD_ID, GROUP_CONCAT(DISTINCT %s SEPARATOR  '     ') as %s ",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "")));
           repeatedGrids.add(repeatedGridName);
         } else {
           String fieldsQueried = mapRepeatedGridAndFieldQueriedInRepeatedGrid.get(repeatedGridName);
           String fieldsToBeAdded =
-              String.format(
-                  " , GROUP_CONCAT(DISTINCT %s SEPARATOR  '     ') as %s",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
+            String.format(
+              " , GROUP_CONCAT(DISTINCT %s SEPARATOR  '     ') as %s",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
         }
       }
 
-      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
+      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
         multiValueFieldUnderSection.add(fieldSetting.getDesignName());
       } else {
         normalFields +=
-            String.format(
-                " , GROUP_CONCAT(DISTINCT %s SEPARATOR  '@@@') as %s ",
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
+          String.format(
+            " , GROUP_CONCAT(DISTINCT %s SEPARATOR  '@@@') as %s ",
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
       }
 
       nestedFields +=
-          String.format(" , %s ", fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
+        String.format(" , %s ", fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
     }
 
     String sqlMultiValueFields = "";
-    for (String multiValueField : multiValueFieldUnderSection) {
+    for (String multiValueField: multiValueFieldUnderSection) {
       sqlMultiValueFields +=
-          String.format(
-              " LEFT JOIN(SELECT %s_SYS_RECORD_ID, , GROUP_CONCAT(DISTINCT %s SEPARATOR  '; ') as %s, GROUP_CONCAT(DISTINCT %s SEPARATOR  '; ') as %s GROUP BY %s_SYS_RECORD_ID) as %s ON %s.SYS_RECORD_ID = %s_SYS_RECORD_ID ",
-              repeatedSectionOrGridName.toLowerCase().replaceAll(formName.toUpperCase() + "_", ""),
-              multiValueField + "_VALUE",
-              multiValueField + "_VALUE",
-              multiValueField + "_DISPLAY",
-              multiValueField + "_DISPLAY",
-              "abcd" + UUID.randomUUID().toString().replaceAll("-", ""),
-              repeatedSectionOrGridName.toLowerCase().replaceAll(formName.toUpperCase() + "_", ""),
-              "abcd" + UUID.randomUUID().toString().replaceAll("-", ""),
-              repeatedSectionOrGridName.toLowerCase().replaceAll(formName.toUpperCase() + "_", ""),
-              repeatedSectionOrGridName.toLowerCase().replaceAll(formName.toUpperCase() + "_", ""));
+        String.format(
+          " LEFT JOIN(SELECT %s_SYS_RECORD_ID, , GROUP_CONCAT(DISTINCT %s SEPARATOR  '; ') as %s, GROUP_CONCAT(DISTINCT %s SEPARATOR  '; ') as %s GROUP BY %s_SYS_RECORD_ID) as %s ON %s.SYS_RECORD_ID = %s_SYS_RECORD_ID ",
+          repeatedSectionOrGridName.toLowerCase().replaceAll(formName.toUpperCase() + "_", ""),
+          multiValueField + "_VALUE",
+          multiValueField + "_VALUE",
+          multiValueField + "_DISPLAY",
+          multiValueField + "_DISPLAY",
+          "abcd" + UUID.randomUUID().toString().replaceAll("-", ""),
+          repeatedSectionOrGridName.toLowerCase().replaceAll(formName.toUpperCase() + "_", ""),
+          "abcd" + UUID.randomUUID().toString().replaceAll("-", ""),
+          repeatedSectionOrGridName.toLowerCase().replaceAll(formName.toUpperCase() + "_", ""),
+          repeatedSectionOrGridName.toLowerCase().replaceAll(formName.toUpperCase() + "_", ""));
     }
 
-    for (Map.Entry<String, String> entry :
-        mapRepeatedGridAndFieldQueriedInRepeatedGrid.entrySet()) {
+    for (Map.Entry < String, String > entry:
+      mapRepeatedGridAndFieldQueriedInRepeatedGrid.entrySet()) {
       String tableAliasNested = "abcd" + UUID.randomUUID().toString().replaceAll("-", "");
       sqlMultiRepeatedGrid +=
-          String.format(
-              " left join (\r\nselect %s\r\nfrom  %s\r\ngroup by SECTION_SYS_RECORD_ID) as %s \r\non %s.SYS_RECORD_ID = %s.section_sys_record_id) as %s ",
-              entry.getValue(),
-              entry.getKey().toLowerCase(),
-              tableAliasNested,
-              repeatedSectionOrGridName.toLowerCase(),
-              tableAliasNested,
-              "abcd" + UUID.randomUUID().toString().replaceAll("-", ""));
+        String.format(
+          " left join (\r\nselect %s\r\nfrom  %s\r\ngroup by SECTION_SYS_RECORD_ID) as %s \r\non %s.SYS_RECORD_ID = %s.section_sys_record_id) as %s ",
+          entry.getValue(),
+          entry.getKey().toLowerCase(),
+          tableAliasNested,
+          repeatedSectionOrGridName.toLowerCase(),
+          tableAliasNested,
+          "abcd" + UUID.randomUUID().toString().replaceAll("-", ""));
     }
 
     String repeatedSectionTableAlias = "abcd" + UUID.randomUUID().toString().replaceAll("-", "");
     String sqlFinalQuery =
-        String.format(
-            " left join (\r\n\r\nselect %s \r\nfrom (\r\n\r\nselect %s from %s\r\n\r\n\r\n%s \r\n\r\n\r\n\r\ngroup by SYS_DOCUMENT_ID) as %s on a0.sys_document_id = %s.sys_document_id ",
-            normalFields,
-            nestedFields,
-            repeatedSectionOrGridName.toLowerCase(),
-            sqlMultiRepeatedGrid,
-            repeatedSectionTableAlias,
-            repeatedSectionTableAlias);
+      String.format(
+        " left join (\r\n\r\nselect %s \r\nfrom (\r\n\r\nselect %s from %s\r\n\r\n\r\n%s \r\n\r\n\r\n\r\ngroup by SYS_DOCUMENT_ID) as %s on a0.sys_document_id = %s.sys_document_id ",
+        normalFields,
+        nestedFields,
+        repeatedSectionOrGridName.toLowerCase(),
+        sqlMultiRepeatedGrid,
+        repeatedSectionTableAlias,
+        repeatedSectionTableAlias);
 
     return sqlFinalQuery;
   }
 
   private String sqlBuildCase9Query(
-      String formName, LinkedList<FieldSetting> fieldNamesList, String repeatedSectionOrGridName) {
-    Set<String> repeatedGridsManyRepeatedGrid = new HashSet<>();
-    Map<String, String> mapManyRepeatedGrids =
-        new HashMap<>(); // repeated grids - fields queried at repeated grid
-    Map<String, String> mapManyMultiValueFields =
-        new HashMap<>(); // repeated grids - fields queried at multivalue fields
+    String formName, LinkedList < FieldSetting > fieldNamesList, String repeatedSectionOrGridName) {
+    Set < String > repeatedGridsManyRepeatedGrid = new HashSet < > ();
+    Map < String, String > mapManyRepeatedGrids =
+      new HashMap < > (); // repeated grids - fields queried at repeated grid
+    Map < String, String > mapManyMultiValueFields =
+      new HashMap < > (); // repeated grids - fields queried at multivalue fields
     String sectionFields = "SYS_DOCUMENT_ID";
-    List<String> mapManyMultiValieFieldsWithinSection = new ArrayList<>();
+    List < String > mapManyMultiValieFieldsWithinSection = new ArrayList < > ();
 
-    for (FieldSetting fieldSetting : fieldNamesList) {
+    for (FieldSetting fieldSetting: fieldNamesList) {
 
       GridSetting parentGrid = fieldSetting.getParentGridSetting();
       if (!parentGrid.getDesignName().contains(repeatedSectionOrGridName)) {
 
         String multiValueFieldsQuery =
-            parentGrid.getDesignName().replaceAll(formName.toUpperCase() + "_", "").toLowerCase()
-                + "_SYS_RECORD_ID";
+          parentGrid.getDesignName().replaceAll(formName.toUpperCase() + "_", "").toLowerCase() +
+          "_SYS_RECORD_ID";
 
-        if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
+        if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1 ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1 ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1 ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
 
           String multivalueFieldsQuery =
-              String.format(
-                  " ,group_concat(distinct %s separator '; ') as %s, group_concat(distinct %s separator '; ') as %s from %s ",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
-                  fieldSetting.getDesignName().toLowerCase());
+            String.format(
+              " ,group_concat(distinct %s separator '; ') as %s, group_concat(distinct %s separator '; ') as %s from %s ",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
+              fieldSetting.getDesignName().toLowerCase());
 
           String multivalueFieldsQueryWithoutFrom =
-              String.format(
-                  " ,group_concat(distinct %s separator '; ') as %s, group_concat(distinct %s separator '; ') as %s ",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE");
+            String.format(
+              " ,group_concat(distinct %s separator '; ') as %s, group_concat(distinct %s separator '; ') as %s ",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE");
           if (!mapManyMultiValueFields.containsKey(parentGrid.getDesignName())) {
             mapManyMultiValueFields.put(parentGrid.getDesignName(), multivalueFieldsQuery);
 
@@ -2039,18 +2059,18 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
           }
 
           sectionFields +=
-              String.format(
-                  " ,group_concat(distinct %s separator '@@@') as %s, group_concat(distinct %s separator '@@@') as %s ",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE");
+            String.format(
+              " ,group_concat(distinct %s separator '@@@') as %s, group_concat(distinct %s separator '@@@') as %s ",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE");
         } else {
           String normalFieldsQuery =
-              String.format(
-                  " ,group_concat(distinct %s separator '    ') as %s ",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
+            String.format(
+              " ,group_concat(distinct %s separator '    ') as %s ",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
 
           if (!mapManyRepeatedGrids.containsKey(parentGrid.getDesignName())) {
             mapManyRepeatedGrids.put(parentGrid.getDesignName(), normalFieldsQuery);
@@ -2062,179 +2082,178 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
           }
 
           sectionFields +=
-              String.format(
-                  " ,group_concat(distinct %s separator '@@@') as %s, group_concat(distinct %s separator '@@@') as %s ",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE");
+            String.format(
+              " ,group_concat(distinct %s separator '@@@') as %s, group_concat(distinct %s separator '@@@') as %s ",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE");
         }
 
       } else {
-        if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES
-            || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
+        if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1 ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1 ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1 ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES ||
+          fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
           // deal with many multivalue field
           sectionFields +=
-              String.format(
-                  " ,group_concat(distinct %s separator '@@@') as %s, group_concat(distinct %s separator '@@@') as %s ",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE");
+            String.format(
+              " ,group_concat(distinct %s separator '@@@') as %s, group_concat(distinct %s separator '@@@') as %s ",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE");
         } else {
           sectionFields +=
-              String.format(
-                  " , group_concat(distinct %s separator '@@@') as %s ",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
+            String.format(
+              " , group_concat(distinct %s separator '@@@') as %s ",
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
         }
       }
     }
 
     String deepestMultivalue = "";
 
-    for (Map.Entry<String, String> entry : mapManyMultiValueFields.entrySet()) {
+    for (Map.Entry < String, String > entry: mapManyMultiValueFields.entrySet()) {
       String deepestTableAlias = "abcd" + UUID.randomUUID().toString().replaceAll("-", "");
       deepestMultivalue +=
-          String.format(
-              " left join(\r\nselect %s_SYS_RECORD_ID %s\r\ngroup by %s_SYS_RECORD_ID) as %s \r\non %s.sys_record_id = %s.%s_SYS_RECORD_ID\r\n",
-              entry.getKey().replaceAll(formName.toUpperCase() + "_", "").toLowerCase(),
-              entry.getValue(),
-              entry.getKey().replaceAll(formName.toUpperCase() + "_", "").toLowerCase(),
-              deepestTableAlias,
-              entry.getKey().toLowerCase(),
-              deepestTableAlias,
-              entry.getKey().replaceAll(formName.toUpperCase() + "_", "").toLowerCase());
+        String.format(
+          " left join(\r\nselect %s_SYS_RECORD_ID %s\r\ngroup by %s_SYS_RECORD_ID) as %s \r\non %s.sys_record_id = %s.%s_SYS_RECORD_ID\r\n",
+          entry.getKey().replaceAll(formName.toUpperCase() + "_", "").toLowerCase(),
+          entry.getValue(),
+          entry.getKey().replaceAll(formName.toUpperCase() + "_", "").toLowerCase(),
+          deepestTableAlias,
+          entry.getKey().toLowerCase(),
+          deepestTableAlias,
+          entry.getKey().replaceAll(formName.toUpperCase() + "_", "").toLowerCase());
     }
 
     String repeatedGridQuery = "";
 
-    for (Map.Entry<String, String> entry : mapManyRepeatedGrids.entrySet()) {
+    for (Map.Entry < String, String > entry: mapManyRepeatedGrids.entrySet()) {
       String tableAliasGridQuery = "abcd" + UUID.randomUUID().toString().replaceAll("-", "");
       repeatedGridQuery +=
-          String.format(
-              " left join (\r\nselect SECTION_SYS_RECORD_ID %s from \r\n%s  %s group by SECTION_SYS_RECORD_ID) as %s\r\non \r\n%s.sys_record_id = %s.section_sys_record_id ",
-              entry.getValue(),
-              entry.getKey().toLowerCase(),
-              deepestMultivalue,
-              tableAliasGridQuery,
-              repeatedSectionOrGridName.toLowerCase(),
-              tableAliasGridQuery);
+        String.format(
+          " left join (\r\nselect SECTION_SYS_RECORD_ID %s from \r\n%s  %s group by SECTION_SYS_RECORD_ID) as %s\r\non \r\n%s.sys_record_id = %s.section_sys_record_id ",
+          entry.getValue(),
+          entry.getKey().toLowerCase(),
+          deepestMultivalue,
+          tableAliasGridQuery,
+          repeatedSectionOrGridName.toLowerCase(),
+          tableAliasGridQuery);
     }
     String tableAliasSection = "abcd" + UUID.randomUUID().toString().replaceAll("-", "");
     String finalQuery =
-        String.format(
-            " left join (select  %s from %s  %s group by sys_document_id) as %s on a0.sys_document_id = %s.sys_document_id ",
-            sectionFields,
-            repeatedSectionOrGridName.toLowerCase(),
-            repeatedGridQuery,
-            tableAliasSection,
-            tableAliasSection);
+      String.format(
+        " left join (select  %s from %s  %s group by sys_document_id) as %s on a0.sys_document_id = %s.sys_document_id ",
+        sectionFields,
+        repeatedSectionOrGridName.toLowerCase(),
+        repeatedGridQuery,
+        tableAliasSection,
+        tableAliasSection);
 
     return finalQuery;
   }
 
-  private String sqlViewQuery(
-      LinkedList<FieldSetting> fieldNamesList, String formName, Document document) {
+  private String buildXMLTemplate(
+    LinkedList < FieldSetting > fieldNamesList, String formName, Document document) {
     String sqlViewQuery =
-        "let $sorted_results := for $form_1 in $sql_results where $form_1//sql:SYS_DOCUMENT_ID != '' return <SYS_VIEW_ROW-iteration>  <SYS_VIEW_ROW_SELECT/>  <SYS_VIEW_ROW_ID>    {data($form_1//sql:SYS_DOCUMENT_ID)}  </SYS_VIEW_ROW_ID>  ";
+      "let $sorted_results := for $form_1 in $sql_results where $form_1//sql:SYS_DOCUMENT_ID != '' return <SYS_VIEW_ROW-iteration>  <SYS_VIEW_ROW_SELECT/>  <SYS_VIEW_ROW_ID>    {data($form_1//sql:SYS_DOCUMENT_ID)}  </SYS_VIEW_ROW_ID>  ";
     sqlViewQuery +=
-        sqlBuildCase123ViewQuery(fieldNamesList, formName)
-            + sqlBuildCase456789ViewQuery(document, formName);
+      sqlBuildCase123ViewQuery(fieldNamesList, formName) +
+      sqlBuildCase456789ViewQuery(document, formName);
 
     return sqlViewQuery;
   }
 
   private String sqlBuildCase123ViewQuery(
-      LinkedList<FieldSetting> fieldNamesList, String formName) {
+    LinkedList < FieldSetting > fieldNamesList, String formName) {
     String sqlViewQuery = "";
-    for (FieldSetting fieldSetting : fieldNamesList) {
-      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI
-          ) {
+    for (FieldSetting fieldSetting: fieldNamesList) {
+      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1 ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI
+      ) {
         sqlViewQuery +=
-            String.format(
-                " <SYS_VIEW_COLUMN name=%s type=\"%s\" isNames=%s>\r\n"
-                    + "  <SYS_VIEW_COLUMN-iteration>\r\n"
-                    + "    <SYS_VIEW_COLUMN_VALUE>{data($form_1//sql:%s)}</SYS_VIEW_COLUMN_VALUE>\r\n"
-                    + "    <SYS_VIEW_COLUMN_DISPLAY_VALUE>{data($form_1//sql:%s)}</SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n"
-                    + "  </SYS_VIEW_COLUMN-iteration>\r\n"
-                    + "</SYS_VIEW_COLUMN>\r\n",
-                String.format("\"%s\"", fieldSetting.getDesignName()),
-                "1",
-                "\"\"",
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY");
+          String.format(
+            " <SYS_VIEW_COLUMN name=%s type=\"%s\" isNames=%s>\r\n" +
+            "  <SYS_VIEW_COLUMN-iteration>\r\n" +
+            "    <SYS_VIEW_COLUMN_VALUE>{data($form_1//sql:%s)}</SYS_VIEW_COLUMN_VALUE>\r\n" +
+            "    <SYS_VIEW_COLUMN_DISPLAY_VALUE>{data($form_1//sql:%s)}</SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n" +
+            "  </SYS_VIEW_COLUMN-iteration>\r\n" +
+            "</SYS_VIEW_COLUMN>\r\n",
+            String.format("\"%s\"", fieldSetting.getDesignName()),
+            "1",
+            "\"\"",
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_VALUE",
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", "") + "_DISPLAY");
 
-      } else if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_ATTACHMENT
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_IMAGE_ATTACHMENT
-          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_PAINT_ATTACHMENT) {
+      } else if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_ATTACHMENT ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_IMAGE_ATTACHMENT ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_PAINT_ATTACHMENT) {
         String emptyResult =
-            String.format(
-                " <SYS_VIEW_COLUMN name=\"FORM_1_ATTACHMENT_566434\" type=\"%s\" isNames=\"false\">\r\n        <SYS_VIEW_COLUMN-iteration>\r\n            <SYS_VIEW_COLUMN_VALUE/>\r\n            <SYS_VIEW_COLUMN_DISPLAY_VALUE/>\r\n        </SYS_VIEW_COLUMN-iteration>\r\n    </SYS_VIEW_COLUMN>",
-                fieldSetting.getDesignName(), fieldSetting.getFieldType());
+          String.format(
+            " <SYS_VIEW_COLUMN name=\"FORM_1_ATTACHMENT_566434\" type=\"%s\" isNames=\"false\">\r\n        <SYS_VIEW_COLUMN-iteration>\r\n            <SYS_VIEW_COLUMN_VALUE/>\r\n            <SYS_VIEW_COLUMN_DISPLAY_VALUE/>\r\n        </SYS_VIEW_COLUMN-iteration>\r\n    </SYS_VIEW_COLUMN>",
+            fieldSetting.getDesignName(), fieldSetting.getFieldType());
 
         sqlViewQuery +=
-            String.format(
-                "{ if(data($form_1//sql:%s) = '') then (%s)else (\r\n  <SYS_VIEW_COLUMN name=\"%s\" type=\"%s\" filename=\"{substring-before(substring-after(data($form_1//sql:%s),' | '),' | ')}\" mediatype=\"{substring-after(substring-after(data($form_1//sql:%s),' | '),' | ')}\" isNames=\"false\">\r\n    <SYS_VIEW_COLUMN-iteration>\r\n      <SYS_VIEW_COLUMN_VALUE>{substring-before(data($form_1//sql:%s),' | ')}</SYS_VIEW_COLUMN_VALUE>\r\n      <SYS_VIEW_COLUMN_DISPLAY_VALUE>{substring-before(substring-after(data($form_1//sql:%s),' | '),' | ')}</SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n    </SYS_VIEW_COLUMN-iteration>\r\n  </SYS_VIEW_COLUMN>) }",
-                fieldSetting.getDesignName(),
-                emptyResult,
-                fieldSetting.getDesignName(),
-                fieldSetting.getFieldType(),
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
-      } 
-      else if(fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATE_AND_TIME
-              || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATE_FIELDS
-              || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATE_ONLY
-              || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_DATE) {
-
-          sqlViewQuery +=
-              String.format(
-                  " <SYS_VIEW_COLUMN name=%s type=\"%s\" isNames=%s>\r\n"
-                      + "  <SYS_VIEW_COLUMN-iteration>\r\n"
-                      + "    <SYS_VIEW_COLUMN_VALUE>{data($form_1//sql:%s)}</SYS_VIEW_COLUMN_VALUE>\r\n"
-                      + "    <SYS_VIEW_COLUMN_DISPLAY_VALUE>{data($form_1//sql:%s)}</SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n"
-                      + "  </SYS_VIEW_COLUMN-iteration>\r\n"
-                      + "</SYS_VIEW_COLUMN>\r\n",
-                  String.format("\"%s\"", fieldSetting.getDesignName()),
-                  fieldSetting.getFieldType(),
-                  "\"\"",
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                  fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
-        }else {
+          String.format(
+            "{ if(data($form_1//sql:%s) = '') then (%s)else (\r\n  <SYS_VIEW_COLUMN name=\"%s\" type=\"%s\" filename=\"{substring-before(substring-after(data($form_1//sql:%s),' | '),' | ')}\" mediatype=\"{substring-after(substring-after(data($form_1//sql:%s),' | '),' | ')}\" isNames=\"false\">\r\n    <SYS_VIEW_COLUMN-iteration>\r\n      <SYS_VIEW_COLUMN_VALUE>{substring-before(data($form_1//sql:%s),' | ')}</SYS_VIEW_COLUMN_VALUE>\r\n      <SYS_VIEW_COLUMN_DISPLAY_VALUE>{substring-before(substring-after(data($form_1//sql:%s),' | '),' | ')}</SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n    </SYS_VIEW_COLUMN-iteration>\r\n  </SYS_VIEW_COLUMN>) }",
+            fieldSetting.getDesignName(),
+            emptyResult,
+            fieldSetting.getDesignName(),
+            fieldSetting.getFieldType(),
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
+      } else if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATE_AND_TIME ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATE_FIELDS ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DATE_ONLY ||
+        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_DATE) {
 
         sqlViewQuery +=
-            String.format(
-                " <SYS_VIEW_COLUMN name=%s type=\"%s\" isNames=%s>\r\n"
-                    + "  <SYS_VIEW_COLUMN-iteration>\r\n"
-                    + "    <SYS_VIEW_COLUMN_VALUE>{replace(replace(replace(data($form_1//sql:%s[1]),'&amp;lt;','&lt;'),'&amp;gt;','&gt;'),'&amp;amp;','&amp;')}</SYS_VIEW_COLUMN_VALUE>\r\n"
-                    + "    <SYS_VIEW_COLUMN_DISPLAY_VALUE>{replace(replace(replace(data($form_1//sql:%s[1]),'&amp;lt;','&lt;'),'&amp;gt;','&gt;'),'&amp;amp;','&amp;')}</SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n"
-                    + "  </SYS_VIEW_COLUMN-iteration>\r\n"
-                    + "</SYS_VIEW_COLUMN>\r\n",
-                String.format("\"%s\"", fieldSetting.getDesignName()),
-                fieldSetting.getFieldType(),
-                "\"\"",
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
+          String.format(
+            " <SYS_VIEW_COLUMN name=%s type=\"%s\" isNames=%s>\r\n" +
+            "  <SYS_VIEW_COLUMN-iteration>\r\n" +
+            "    <SYS_VIEW_COLUMN_VALUE>{data($form_1//sql:%s)}</SYS_VIEW_COLUMN_VALUE>\r\n" +
+            "    <SYS_VIEW_COLUMN_DISPLAY_VALUE>{data($form_1//sql:%s)}</SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n" +
+            "  </SYS_VIEW_COLUMN-iteration>\r\n" +
+            "</SYS_VIEW_COLUMN>\r\n",
+            String.format("\"%s\"", fieldSetting.getDesignName()),
+            fieldSetting.getFieldType(),
+            "\"\"",
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
+      } else {
+
+        sqlViewQuery +=
+          String.format(
+            " <SYS_VIEW_COLUMN name=%s type=\"%s\" isNames=%s>\r\n" +
+            "  <SYS_VIEW_COLUMN-iteration>\r\n" +
+            "    <SYS_VIEW_COLUMN_VALUE>{replace(replace(replace(data($form_1//sql:%s[1]),'&amp;lt;','&lt;'),'&amp;gt;','&gt;'),'&amp;amp;','&amp;')}</SYS_VIEW_COLUMN_VALUE>\r\n" +
+            "    <SYS_VIEW_COLUMN_DISPLAY_VALUE>{replace(replace(replace(data($form_1//sql:%s[1]),'&amp;lt;','&lt;'),'&amp;gt;','&gt;'),'&amp;amp;','&amp;')}</SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n" +
+            "  </SYS_VIEW_COLUMN-iteration>\r\n" +
+            "</SYS_VIEW_COLUMN>\r\n",
+            String.format("\"%s\"", fieldSetting.getDesignName()),
+            fieldSetting.getFieldType(),
+            "\"\"",
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
       }
     }
 
@@ -2247,28 +2266,28 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
 
       SettingManager sm = SettingManager.getSettingManager();
       Section secondaryFormSection = document.getSectionFromMap("SYS_VIEW_SETTING_REP_FIELDS");
-      LinkedList<FieldSetting> fieldNamesList = null;
+      LinkedList < FieldSetting > fieldNamesList = null;
 
       if (secondaryFormSection != null) {
-        Collection<SectionRecord> secondaryFormRecordCol = secondaryFormSection.getSectionRecords();
+        Collection < SectionRecord > secondaryFormRecordCol = secondaryFormSection.getSectionRecords();
         if (secondaryFormRecordCol != null) {
-          for (SectionRecord secondaryFormRecord : secondaryFormRecordCol) {
+          for (SectionRecord secondaryFormRecord: secondaryFormRecordCol) {
             String repeaterName =
-                secondaryFormRecord
-                    .getFieldFromMap("SYS_VIEW_SETTING_REP_SEC_NAME")
-                    .getValuesAsDisplayText();
+              secondaryFormRecord
+              .getFieldFromMap("SYS_VIEW_SETTING_REP_SEC_NAME")
+              .getValuesAsDisplayText();
             if (repeaterName != null && !repeaterName.equals("")) {
               // there is repeated section
               Grid columnGrid =
-                  secondaryFormRecord.getGridFromMap("SYS_VIEW_SETTING_REP_FIELDS_SELECTION");
+                secondaryFormRecord.getGridFromMap("SYS_VIEW_SETTING_REP_FIELDS_SELECTION");
               if (columnGrid != null) {
-                Collection<GridRecord> columnRecords = columnGrid.getGridRecords();
+                Collection < GridRecord > columnRecords = columnGrid.getGridRecords();
                 if (columnRecords != null) {
                   boolean hasFieldToQuery = false;
-                  for (GridRecord columnRecord : columnRecords) {
+                  for (GridRecord columnRecord: columnRecords) {
                     AutoCompleteList fieldIDField =
-                        (AutoCompleteList)
-                            columnRecord.getFieldFromMap("SYS_VIEW_SETTING_REP_FIELDS_FIELD_NAME");
+                      (AutoCompleteList)
+                    columnRecord.getFieldFromMap("SYS_VIEW_SETTING_REP_FIELDS_FIELD_NAME");
                     String fieldID = fieldIDField.getValuesAsText();
 
                     FieldSetting fieldSetting = sm.getFieldSetting(new Long(fieldID));
@@ -2282,18 +2301,18 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
                     String queriedFields = "SYS_DOCUMENT_ID, ";
                     StringBuilder correspondingViewQuery = new StringBuilder();
 
-                    for (FieldSetting fieldSetting : fieldNamesList) {
+                    for (FieldSetting fieldSetting: fieldNamesList) {
 
                       sqlViewQuery +=
-                          String.format(
-                              " { if(data($form_1//sql:%s_VALUE) = '') then (\r\n  <SYS_VIEW_SECONDARY_FORM parentForm=\"%s\">\r\n    <SYS_VIEW_COLUMN name=\"%s\" type=\"8\" isNames=\"false\">\r\n      <SYS_VIEW_COLUMN-iteration><SYS_VIEW_COLUMN_VALUE/>\r\n    <SYS_VIEW_COLUMN_DISPLAY_VALUE/>\r\n  </SYS_VIEW_COLUMN-iteration>\r\n</SYS_VIEW_COLUMN >\r\n</SYS_VIEW_SECONDARY_FORM>\r\n  )else (for $val_1 at $index_1 in tokenize(data($form_1//sql:%s_VALUE),\"@@@\") return\r\n  <SYS_VIEW_SECONDARY_FORM parentForm=\"%s\">\r\n    <SYS_VIEW_COLUMN name=\"%s\" type=\"8\" isNames=\"false\">\r\n      <SYS_VIEW_COLUMN-iteration>\r\n        <SYS_VIEW_COLUMN_VALUE>\r\n       {replace(replace(replace(data($val_1[1]),'&amp;lt;','&lt;'),'&amp;gt;','&gt;'),'&amp;amp;','&amp;')}   \r\n        </SYS_VIEW_COLUMN_VALUE>\r\n        {for $val_2 at $index_2 in tokenize(data($form_1//sql:%s_DISPLAY),\"@@@\") where $index_1 = $index_2 return\r\n        <SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n          {replace(replace(replace(data($val_2[1]),'&amp;lt;','&lt;'),'&amp;gt;','&gt;'),'&amp;amp;','&amp;')}\r\n        </SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n        }\r\n      </SYS_VIEW_COLUMN-iteration>\r\n    </SYS_VIEW_COLUMN >\r\n  </SYS_VIEW_SECONDARY_FORM>)\r\n  }",
-                              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                              formName,
-                              fieldSetting.getDesignName(),
-                              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                              formName,
-                              fieldSetting.getDesignName(),
-                              fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
+                        String.format(
+                          " { if(data($form_1//sql:%s_VALUE) = '') then (\r\n  <SYS_VIEW_SECONDARY_FORM parentForm=\"%s\">\r\n    <SYS_VIEW_COLUMN name=\"%s\" type=\"8\" isNames=\"false\">\r\n      <SYS_VIEW_COLUMN-iteration><SYS_VIEW_COLUMN_VALUE/>\r\n    <SYS_VIEW_COLUMN_DISPLAY_VALUE/>\r\n  </SYS_VIEW_COLUMN-iteration>\r\n</SYS_VIEW_COLUMN >\r\n</SYS_VIEW_SECONDARY_FORM>\r\n  )else (for $val_1 at $index_1 in tokenize(data($form_1//sql:%s_VALUE),\"@@@\") return\r\n  <SYS_VIEW_SECONDARY_FORM parentForm=\"%s\">\r\n    <SYS_VIEW_COLUMN name=\"%s\" type=\"8\" isNames=\"false\">\r\n      <SYS_VIEW_COLUMN-iteration>\r\n        <SYS_VIEW_COLUMN_VALUE>\r\n       {replace(replace(replace(data($val_1[1]),'&amp;lt;','&lt;'),'&amp;gt;','&gt;'),'&amp;amp;','&amp;')}   \r\n        </SYS_VIEW_COLUMN_VALUE>\r\n        {for $val_2 at $index_2 in tokenize(data($form_1//sql:%s_DISPLAY),\"@@@\") where $index_1 = $index_2 return\r\n        <SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n          {replace(replace(replace(data($val_2[1]),'&amp;lt;','&lt;'),'&amp;gt;','&gt;'),'&amp;amp;','&amp;')}\r\n        </SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n        }\r\n      </SYS_VIEW_COLUMN-iteration>\r\n    </SYS_VIEW_COLUMN >\r\n  </SYS_VIEW_SECONDARY_FORM>)\r\n  }",
+                          fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+                          formName,
+                          fieldSetting.getDesignName(),
+                          fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+                          formName,
+                          fieldSetting.getDesignName(),
+                          fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""));
                     }
                   }
                 }
@@ -2319,28 +2338,28 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
 
       SettingManager sm = SettingManager.getSettingManager();
       Section secondaryFormSection = document.getSectionFromMap("SYS_VIEW_SETTING_REP_FIELDS");
-      LinkedList<FieldSetting> fieldNamesList = null;
+      LinkedList < FieldSetting > fieldNamesList = null;
 
       if (secondaryFormSection != null) {
-        Collection<SectionRecord> secondaryFormRecordCol = secondaryFormSection.getSectionRecords();
+        Collection < SectionRecord > secondaryFormRecordCol = secondaryFormSection.getSectionRecords();
         if (secondaryFormRecordCol != null) {
-          for (SectionRecord secondaryFormRecord : secondaryFormRecordCol) {
+          for (SectionRecord secondaryFormRecord: secondaryFormRecordCol) {
             String repeaterName =
-                secondaryFormRecord
-                    .getFieldFromMap("SYS_VIEW_SETTING_REP_SEC_NAME")
-                    .getValuesAsDisplayText();
+              secondaryFormRecord
+              .getFieldFromMap("SYS_VIEW_SETTING_REP_SEC_NAME")
+              .getValuesAsDisplayText();
             if (repeaterName != null && !repeaterName.equals("")) {
               // there is repeated section
               Grid columnGrid =
-                  secondaryFormRecord.getGridFromMap("SYS_VIEW_SETTING_REP_FIELDS_SELECTION");
+                secondaryFormRecord.getGridFromMap("SYS_VIEW_SETTING_REP_FIELDS_SELECTION");
               if (columnGrid != null) {
-                Collection<GridRecord> columnRecords = columnGrid.getGridRecords();
+                Collection < GridRecord > columnRecords = columnGrid.getGridRecords();
                 if (columnRecords != null) {
                   boolean hasFieldToQuery = false;
-                  for (GridRecord columnRecord : columnRecords) {
+                  for (GridRecord columnRecord: columnRecords) {
                     AutoCompleteList fieldIDField =
-                        (AutoCompleteList)
-                            columnRecord.getFieldFromMap("SYS_VIEW_SETTING_REP_FIELDS_FIELD_NAME");
+                      (AutoCompleteList)
+                    columnRecord.getFieldFromMap("SYS_VIEW_SETTING_REP_FIELDS_FIELD_NAME");
                     String fieldID = fieldIDField.getValuesAsText();
 
                     FieldSetting fieldSetting = sm.getFieldSetting(new Long(fieldID));
@@ -2353,50 +2372,50 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
                   if (hasFieldToQuery) {
                     String queriedFields = "SYS_DOCUMENT_ID, ";
                     StringBuilder correspondingViewQuery = new StringBuilder();
-                    for (FieldSetting fieldSetting : fieldNamesList) {
+                    for (FieldSetting fieldSetting: fieldNamesList) {
 
-                      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE
-                          || fieldSetting.getFieldType()
-                              == FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK
-                          || fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER
-                          || fieldSetting.getFieldType()
-                              == FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES
-                          || fieldSetting.getFieldType()
-                              == FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
+                      if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_DROP_DOWN_SELECT_1 ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_1 ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_AUTOCOMPLETE ||
+                        fieldSetting.getFieldType() ==
+                        FieldSetting.FIELD_TYPE_DATABOUND_SELECT_1 ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_SELECT_MULTI ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_BOX_SELECT_MULTI ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER_LINK ||
+                        fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_TRIGGER ||
+                        fieldSetting.getFieldType() ==
+                        FieldSetting.FIELD_TYPE_SELECT_MULTI_CHECKBOXES ||
+                        fieldSetting.getFieldType() ==
+                        FieldSetting.FIELD_TYPE_AUTOCOMPLETE_MULTI) {
 
                         return sqlBuildCase6And9ViewQuery(document, formName);
 
-                      } else if(fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_ATTACHMENT){
-                        String  p = formName.toUpperCase() + "_";
-                        String fieldName = fieldSetting.getDesignName().replaceAll(p,"");
+                      } else if (fieldSetting.getFieldType() == FieldSetting.FIELD_TYPE_ATTACHMENT) {
+                        String p = formName.toUpperCase() + "_";
+                        String fieldName = fieldSetting.getDesignName().replaceAll(p, "");
                         sqlViewQuery += String.format("{ if(data($form_1//sql:%s) = '') then (\r\n  <SYS_VIEW_SECONDARY_FORM parentForm=\"%s\">\r\n    <SYS_VIEW_COLUMN name=\"%s\" isNames=\"false\">\r\n      <SYS_VIEW_COLUMN-iteration><SYS_VIEW_COLUMN_VALUE/>\r\n    <SYS_VIEW_COLUMN_DISPLAY_VALUE/>\r\n  </SYS_VIEW_COLUMN-iteration>\r\n</SYS_VIEW_COLUMN >\r\n</SYS_VIEW_SECONDARY_FORM>\r\n)else ( for $repeatSectionData in tokenize(data($form_1//sql:%s),\"@@@\") return\r\n  <SYS_VIEW_SECONDARY_FORM parentForm=\"%s\">\r\n    <SYS_VIEW_COLUMN name=\"%s\" type=\"20\" filename=\"{substring-before(substring-after(data($form_1//sql:%s),' | '),' | ')}\" \r\n    \tmediatype=\"{substring-after(substring-after(data($form_1//sql:%s),' | '),' | ')}\" isNames=\"false\">\r\n      <SYS_VIEW_COLUMN-iteration>\r\n        <SYS_VIEW_COLUMN_VALUE>\r\n          {substring-before(data($form_1//sql:%s),' | ')}\r\n        </SYS_VIEW_COLUMN_VALUE>\r\n        <SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n\t\t\t{substring-before(substring-after(data($form_1//sql:%s),' | '),' | ')}\r\n        </SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n      </SYS_VIEW_COLUMN-iteration>\r\n    </SYS_VIEW_COLUMN >\r\n  </SYS_VIEW_SECONDARY_FORM>)\r\n  } ",
-                              fieldName,
-                              formName,
-                              fieldSetting.getDesignName(),
-                              fieldName,
-                              formName,
-                              fieldSetting.getDesignName(),
-                              fieldName,
-                              fieldName,
-                              fieldName,
-                              fieldName);
-                      }else {
+                          fieldName,
+                          formName,
+                          fieldSetting.getDesignName(),
+                          fieldName,
+                          formName,
+                          fieldSetting.getDesignName(),
+                          fieldName,
+                          fieldName,
+                          fieldName,
+                          fieldName);
+                      } else {
                         //DebugUtility.debug("FORMNAME IS: " + formName);
                         //DebugUtility.debug("DESIGN NAME IS: " + fieldSetting.getDesignName());
                         sqlViewQuery +=
-                            String.format(
-                                "{ if(data($form_1//sql:%s) = '') then (\r\n  <SYS_VIEW_SECONDARY_FORM parentForm=\"%s\">\r\n    <SYS_VIEW_COLUMN name=\"%s\" type=\"8\" isNames=\"false\">\r\n      <SYS_VIEW_COLUMN-iteration><SYS_VIEW_COLUMN_VALUE/>\r\n    <SYS_VIEW_COLUMN_DISPLAY_VALUE/>\r\n  </SYS_VIEW_COLUMN-iteration>\r\n</SYS_VIEW_COLUMN >\r\n</SYS_VIEW_SECONDARY_FORM>\r\n)else ( for $repeatSectionData in tokenize(data($form_1//sql:%s),\"@@@\") return\r\n  <SYS_VIEW_SECONDARY_FORM parentForm=\"%s\">\r\n    <SYS_VIEW_COLUMN name=\"%s\" type=\"8\" isNames=\"false\">\r\n      <SYS_VIEW_COLUMN-iteration>\r\n        <SYS_VIEW_COLUMN_VALUE>\r\n          {replace(replace(replace(data($repeatSectionData[1]),'&amp;lt;','&lt;'),'&amp;gt;','&gt;'),'&amp;amp;','&amp;')}\r\n        </SYS_VIEW_COLUMN_VALUE>\r\n        <SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n          {replace(replace(replace(data($repeatSectionData[1]),'&amp;lt;','&lt;'),'&amp;gt;','&gt;'),'&amp;amp;','&amp;')}\r\n        </SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n      </SYS_VIEW_COLUMN-iteration>\r\n    </SYS_VIEW_COLUMN >\r\n  </SYS_VIEW_SECONDARY_FORM>)\r  }",
-                                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                                formName,
-                                fieldSetting.getDesignName(),
-                                fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
-                                formName,
-                                fieldSetting.getDesignName());
+                          String.format(
+                            "{ if(data($form_1//sql:%s) = '') then (\r\n  <SYS_VIEW_SECONDARY_FORM parentForm=\"%s\">\r\n    <SYS_VIEW_COLUMN name=\"%s\" type=\"8\" isNames=\"false\">\r\n      <SYS_VIEW_COLUMN-iteration><SYS_VIEW_COLUMN_VALUE/>\r\n    <SYS_VIEW_COLUMN_DISPLAY_VALUE/>\r\n  </SYS_VIEW_COLUMN-iteration>\r\n</SYS_VIEW_COLUMN >\r\n</SYS_VIEW_SECONDARY_FORM>\r\n)else ( for $repeatSectionData in tokenize(data($form_1//sql:%s),\"@@@\") return\r\n  <SYS_VIEW_SECONDARY_FORM parentForm=\"%s\">\r\n    <SYS_VIEW_COLUMN name=\"%s\" type=\"8\" isNames=\"false\">\r\n      <SYS_VIEW_COLUMN-iteration>\r\n        <SYS_VIEW_COLUMN_VALUE>\r\n          {replace(replace(replace(data($repeatSectionData[1]),'&amp;lt;','&lt;'),'&amp;gt;','&gt;'),'&amp;amp;','&amp;')}\r\n        </SYS_VIEW_COLUMN_VALUE>\r\n        <SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n          {replace(replace(replace(data($repeatSectionData[1]),'&amp;lt;','&lt;'),'&amp;gt;','&gt;'),'&amp;amp;','&amp;')}\r\n        </SYS_VIEW_COLUMN_DISPLAY_VALUE>\r\n      </SYS_VIEW_COLUMN-iteration>\r\n    </SYS_VIEW_COLUMN >\r\n  </SYS_VIEW_SECONDARY_FORM>)\r  }",
+                            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+                            formName,
+                            fieldSetting.getDesignName(),
+                            fieldSetting.getDesignName().replaceAll(formName.toUpperCase() + "_", ""),
+                            formName,
+                            fieldSetting.getDesignName());
                       }
                     }
                   }
