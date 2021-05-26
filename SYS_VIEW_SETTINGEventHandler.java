@@ -2167,13 +2167,13 @@ public class SYS_VIEW_SETTINGEventHandler implements DocumentEventHelperInterfac
     String sqlViewQuery =
       "let $sorted_results := for $form_1 in $sql_results where $form_1//sql:SYS_DOCUMENT_ID != '' return <SYS_VIEW_ROW-iteration>  <SYS_VIEW_ROW_SELECT/>  <SYS_VIEW_ROW_ID>    {data($form_1//sql:SYS_DOCUMENT_ID)}  </SYS_VIEW_ROW_ID>  ";
     sqlViewQuery +=
-      sqlBuildCase123ViewQuery(fieldNamesList, formName) +
+      buildXMLTemplateFieldsInParentForm(fieldNamesList, formName) +
       sqlBuildCase456789ViewQuery(document, formName);
 
     return sqlViewQuery;
   }
 
-  private String sqlBuildCase123ViewQuery(
+  private String buildXMLTemplateFieldsInParentForm(
     LinkedList < FieldSetting > fieldNamesList, String formName) {
     String sqlViewQuery = "";
     for (FieldSetting fieldSetting: fieldNamesList) {
